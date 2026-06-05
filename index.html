@@ -545,7 +545,7 @@ function disconnectBT() {
 }
 
 // ══ CALCULAR RMSSD ════════════════════════════════════════
-// Fonte: Marco Altini (HRV4Training) — validado vs Polar H10
+// Fonte: Marco Altini (HRV4Training) — validado vs sensor de referência
 // LnRMSSD = ln(RMSSD) — distribuição mais normal (Frontiers 2025)
 function calcRMSSD() {
   const rr = ST.rrIntervals;
@@ -789,7 +789,7 @@ function renderResultado(s) {
 
 // ══ IA OFFLINE ═══════════════════════════════════════════
 // Fontes embarcadas:
-// • Marco Altini (HRV4Training) — protocolo matinal validado vs Polar H10
+// • Marco Altini (HRV4Training) — protocolo matinal validado vs sensor de referência
 // • Frontiers Physiology 2025 — desvio HRV e performance
 // • HRV4Training App — 100.000+ medições, thresholds validados
 // • PMC5767731 — RMSSD por fase do sono
@@ -800,56 +800,51 @@ function renderResultado(s) {
 function gerarIA(s, medicoes) {
   const body = document.getElementById('ai-body');
   if (!body) return;
-  body.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--t3);font-size:0.72rem;"><div class="ai-dots"><span></span><span></span><span></span></div> Consultando base científica...</div>';
+  body.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--t3);font-size:0.72rem;"><div class="ai-dots"><span></span><span></span><span></span></div> Analisando...</div>';
 
   setTimeout(() => {
-    let txt = '';
     const temBase = s.baseline && medicoes.length >= 3;
     const media7d = medicoes.length >= 3 ? Math.round(medicoes.slice(0,7).reduce((a,m)=>a+m.rmssd,0)/Math.min(7,medicoes.length)) : null;
+    let linhas = [];
 
-    // BLOCO 1 — Status HRV
+    // Linha 1 — Status HRV
     if (s.status === 'RECUPERADO') {
-      txt += `Sistema nervoso em dominância parassimpática — a leitura mais favorável possível para um dia de alta demanda. `;
-      if (temBase) txt += `Seu RMSSD de ${s.rmssd}ms está ${s.desvio}% acima da baseline de ${s.baseline}ms — sinal que o organismo metabolizou o estresse anterior com eficiência. `;
+      linhas.push(temBase
+        ? `✅ RMSSD ${s.rmssd}ms — ${s.desvio}% acima da sua base (${s.baseline}ms). Sistema recuperado.`
+        : `✅ RMSSD ${s.rmssd}ms — sistema em dominância parassimpática.`);
     } else if (s.status === 'NORMAL') {
-      txt += `Equilíbrio dentro da sua variação habitual — sistema operacional sem alertas. `;
-      if (temBase) txt += `RMSSD de ${s.rmssd}ms próximo da baseline de ${s.baseline}ms (desvio: ${s.desvio}%). `;
+      linhas.push(temBase
+        ? `⚪ RMSSD ${s.rmssd}ms — ${s.desvio}% da base (${s.baseline}ms). Equilíbrio normal.`
+        : `⚪ RMSSD ${s.rmssd}ms — dentro do esperado.`);
     } else if (s.status === 'ALERTA') {
-      txt += `HRV abaixo da baseline — carga fisiológica acumulada detectada. `;
-      if (temBase) txt += `Desvio de ${s.desvio}% abaixo dos seus ${s.baseline}ms habituais indica que o sistema nervoso ainda está processando o estresse do ciclo anterior. `;
+      linhas.push(temBase
+        ? `⚠️ RMSSD ${s.rmssd}ms — ${Math.abs(s.desvio)}% abaixo da base (${s.baseline}ms). Carga acumulada.`
+        : `⚠️ RMSSD ${s.rmssd}ms — HRV abaixo do habitual.`);
     } else {
-      txt += `Sistema simpático em dominância — sinal de sobrecarga acumulada. `;
-      if (temBase) txt += `RMSSD de ${s.rmssd}ms representa ${s.desvio}% abaixo da sua baseline de ${s.baseline}ms — limite que a literatura científica classifica como sobrecarga sistêmica relevante. `;
+      linhas.push(temBase
+        ? `🔴 RMSSD ${s.rmssd}ms — ${Math.abs(s.desvio)}% abaixo da base (${s.baseline}ms). Sistema sobrecarregado.`
+        : `🔴 RMSSD ${s.rmssd}ms — sobrecarga detectada.`);
     }
 
-    // BLOCO 2 — LnRMSSD (diferencial científico)
-    txt += `O LnRMSSD de ${s.lnrmssd} é a métrica mais robusta estatisticamente — sua distribuição logarítmica é mais normal e menos sensível a outliers que o RMSSD bruto (Sensors, 2025). Marco Altini — co-fundador do HRV4Training e advisor da Oura — validou a Sensor BT para medições matinais em repouso com precisão comparável ao Polar H10 ECG. `;
-
-    // BLOCO 3 — Contexto turno noturno
-    txt += `Para trabalhadores de turno noturno com alta demanda mecânica, o Journal Circadian Rhythms (2024) documenta que a inversão circadiana eleva o tônus simpático basal — o que significa que sua baseline pessoal já incorpora essa realidade. Comparar com médias populacionais seria incorreto. O correto é sempre comparar você com você mesmo, que é exatamente o que este sistema faz. `;
-
-    // BLOCO 4 — Tendência
+    // Linha 2 — Tendência 7d
     if (media7d && medicoes.length >= 5) {
-      const tendencia = s.rmssd > media7d ? 'ascendente' : s.rmssd < media7d ? 'descendente' : 'estável';
-      const cor_tend = tendencia === 'ascendente' ? 'positiva' : tendencia === 'descendente' ? 'de atenção' : 'neutra';
-      txt += `Tendência dos últimos 7 dias: ${tendencia} (média ${media7d}ms). Uma tendência ${cor_tend} — Frontiers Physiology (2025) confirma que a tendência de 7 dias é mais preditiva de performance do que a leitura isolada do dia. `;
-    } else if (!temBase) {
-      txt += `Continue registrando diariamente — após 7 dias, o sistema terá sua linha base calibrada e os insights serão personalizados com precisão para o seu organismo específico. `;
+      const tend = s.rmssd > media7d ? '↗ subindo' : s.rmssd < media7d ? '↘ caindo' : '→ estável';
+      linhas.push(`Tendência 7d: ${tend} (média ${media7d}ms).`);
     }
 
-    // BLOCO 5 — Recomendação
-    if (s.status === 'RECUPERADO') {
-      txt += `Recomendação: capital de recuperação alto. Janela ideal para treino de maior intensidade, decisões importantes ou aprendizado. Aproveite.`;
-    } else if (s.status === 'NORMAL') {
-      txt += `Recomendação: manutenção do plano habitual. Sem necessidade de ajuste — o sistema está equilibrado.`;
-    } else if (s.status === 'ALERTA') {
-      txt += `Recomendação: reduza a intensidade de qualquer treino planejado. Foque em sono de qualidade, hidratação e proteína. A recuperação acontece fora do esforço.`;
-    } else {
-      txt += `Recomendação crítica: repouso ativo hoje. Qualquer estresse adicional sobre esse estado prolonga o déficit. Prioridade máxima: sono sem fragmentação na próxima janela.`;
-    }
+    // Linha 3 — Recomendação direta
+    const rec = {
+      'RECUPERADO':    '→ Janela verde. Treino intenso ou turno pesado: liberdade total.',
+      'NORMAL':        '→ Siga o plano. Sem ajuste necessário.',
+      'ALERTA':        '→ Reduza intensidade. Priorize sono e proteína.',
+      'SOBRECARREGADO':'→ Repouso ativo. Não adicione carga hoje.'
+    };
+    linhas.push(rec[s.status] || '→ Monitore amanhã.');
+
+    if (!temBase) linhas.push('📊 Calibrando baseline — insight completo em 3+ medições.');
 
     body.style.opacity = '0'; body.style.transition = 'opacity 0.5s';
-    setTimeout(() => { body.textContent = txt; body.style.opacity = '1'; }, 400);
+    setTimeout(() => { body.textContent = linhas.join(' '); body.style.opacity = '1'; }, 400);
   }, 1200);
 }
 
