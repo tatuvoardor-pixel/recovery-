@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>RECOVERY</title>
+<title>SLEEP</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#09090b">
-<meta http-equiv="Permissions-Policy" content="bluetooth=*">
 <script>
 (function(){
   const ico=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
     <rect width="512" height="512" rx="112" fill="#09090b"/>
-    <rect x="186" y="155" width="140" height="210" rx="18" fill="none" stroke="#10b981" stroke-width="14"/>
-    <rect x="226" y="138" width="60" height="26" rx="8" fill="#10b981"/>
-    <rect x="200" y="285" width="112" height="72" rx="10" fill="#10b981" opacity="0.9"/>
-    <line x1="256" y1="270" x2="256" y2="178" stroke="#10b981" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
-    <polyline points="232,224 256,196 256,232 280,204" fill="none" stroke="#09090b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Lua crescente: circulo azul grande + circulo fundo cobrindo parte -->
+    <circle cx="230" cy="256" r="130" fill="#3b82f6"/>
+    <circle cx="190" cy="220" r="115" fill="#09090b"/>
+    <!-- Estrelas simples -->
+    <circle cx="360" cy="140" r="12" fill="#93c5fd"/>
+    <circle cx="400" cy="220" r="8"  fill="#60a5fa"/>
+    <circle cx="370" cy="300" r="6"  fill="#93c5fd"/>
+    <circle cx="340" cy="130" r="5"  fill="#60a5fa"/>
+    <circle cx="410" cy="170" r="5"  fill="#bfdbfe"/>
   </svg>`;
   const iUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ico);
-  const mf={name:"MAX.CORE RECOVERY",short_name:"RECOVERY",display:"fullscreen",orientation:"portrait",start_url:"./index.html",scope:"./",background_color:"#09090b",theme_color:"#09090b",icons:[{src:iUrl,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+  const mf={name:"MAX.CORE SLEEP",short_name:"SLEEP",display:"fullscreen",orientation:"portrait",start_url:"./index.html",scope:"./",background_color:"#09090b",theme_color:"#09090b",icons:[{src:iUrl,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
   const ml=document.createElement('link');ml.rel='manifest';ml.href='data:application/manifest+json;charset=utf-8,'+encodeURIComponent(JSON.stringify(mf));document.head.appendChild(ml);
   const il=document.createElement('link');il.rel='apple-touch-icon';il.href=iUrl;document.head.appendChild(il);
 })();
@@ -28,26 +31,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Roboto+Mono:wght@400;500;700&family=Oswald:wght@400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#09090b;--s1:#111114;--s2:#18181c;--s3:#242428;--bd:#36363e;
-  --tx:#f4f4f5;--t2:#a1a1aa;--t3:#62626e;
-  --grn:#10b981;--grn-d:#10b98112;--grn-m:#10b98145;
-  --grn2:#34d399;--grn3:#6ee7b7;
-  --gold:#f59e0b;--red:#ef4444;--blu:#3b82f6;--pur:#8b5cf6;
+  --bg:#09090b; --s1:#111114; --s2:#18181c; --s3:#242428; --bd:#36363e;
+  --tx:#f4f4f5; --t2:#a1a1aa; --t3:#62626e;
+  --deep:#1d4ed8; --deep-g:#1d4ed812; --deep-m:#1d4ed845;
+  --rem:#6d28d9; --rem-g:#6d28d912; --rem-m:#6d28d945;
+  --light:#64748b; --light-g:#64748b12;
+  --wake:#ef4444;
+  --acc:#2dd4bf;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--tx);overflow:hidden;position:fixed;top:0;left:0;font-family:'Inter',sans-serif;}
 button{border:none;background:none;padding:0;font-family:inherit;color:inherit;cursor:pointer;outline:none;}
 input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-webkit-appearance:none;appearance:none;}
+select{-webkit-appearance:none;appearance:none;}
 
 /* ── CANVAS FUNDO ── */
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* ── SPLASH ── */
-#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;transition:opacity 0.9s ease;}
+#splash{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:999;transition:opacity 0.9s ease;
+}
 #splash.hide{opacity:0;pointer-events:none;}
-.sp-icon{width:72px;height:72px;animation:spUp 1s ease forwards;opacity:0;}
-.sp-name{font-family:'Lilita One',cursive;font-size:1.8rem;letter-spacing:3px;color:var(--grn);animation:spUp 1s 0.2s ease forwards;opacity:0;text-align:center;}
-.sp-sub{font-family:'Roboto Mono',monospace;font-size:0.58rem;letter-spacing:4px;text-transform:uppercase;color:var(--t3);animation:spUp 1s 0.4s ease forwards;opacity:0;text-align:center;}
+.sp-waves{width:80px;height:40px;animation:spUp 1s ease forwards;opacity:0;}
+.sp-name{font-family:'Lilita One',cursive;font-size:2rem;letter-spacing:3px;color:var(--deep);animation:spUp 1s 0.2s ease forwards;opacity:0;}
+.sp-sub{font-family:'Roboto Mono',monospace;font-size:0.58rem;letter-spacing:4px;text-transform:uppercase;color:var(--t3);animation:spUp 1s 0.4s ease forwards;opacity:0;}
 @keyframes spUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
 /* ── APP ── */
@@ -56,7 +67,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 /* ── HEADER ── */
 .hdr{padding:11px 14px 9px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--bd);}
 .hlogo{display:flex;align-items:center;gap:8px;}
-.hname{font-family:'Lilita One',cursive;font-size:1.1rem;letter-spacing:2px;color:var(--grn);}
+.hname{font-family:'Lilita One',cursive;font-size:1.15rem;letter-spacing:2px;color:var(--deep);}
 .hdate{font-family:'Roboto Mono',monospace;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);}
 
 /* ── SCROLL ── */
@@ -66,129 +77,106 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 /* ── CARDS ── */
 .card{background:var(--s1);border:1px solid rgba(255,255,255,0.06);box-shadow:0 10px 28px rgba(0,0,0,0.65);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:11px;}
 .lbl{font-family:'Roboto Mono',monospace;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--t3);}
+.section-title{font-family:'Oswald',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--t2);}
 
-/* ── STATUS PRINCIPAL ── */
-.status-card{
-  background:var(--s1);border:2px solid var(--grn-m);border-radius:16px;
-  padding:24px 18px;display:flex;flex-direction:column;align-items:center;gap:12px;
-  transition:border-color 0.5s ease;
-  box-shadow:0 0 30px rgba(16,185,129,0.08);
-}
-.status-icon-wrap{
-  width:100px;height:100px;position:relative;display:flex;align-items:center;justify-content:center;
-}
-.status-rings{position:absolute;inset:0;}
-.status-label{
-  font-family:'Oswald',sans-serif;font-size:1.4rem;letter-spacing:3px;
-  text-transform:uppercase;color:var(--grn);transition:color 0.5s;
-}
-.status-sub{
-  font-family:'Roboto Mono',monospace;font-size:0.62rem;letter-spacing:2px;
-  text-transform:uppercase;color:var(--t3);text-align:center;
-}
-.rmssd-display{
-  display:flex;align-items:baseline;gap:6px;
-}
-.rmssd-val{font-family:'Lilita One',cursive;font-size:3.5rem;color:var(--tx);line-height:1;}
-.rmssd-unit{font-family:'Roboto Mono',monospace;font-size:0.75rem;color:var(--t3);}
-.baseline-row{
-  display:flex;gap:16px;justify-content:center;
-}
-.bl-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.bl-val{font-family:'Roboto Mono',monospace;font-size:0.85rem;font-weight:700;}
-.bl-lbl{font-family:'Oswald',sans-serif;font-size:0.52rem;letter-spacing:1px;text-transform:uppercase;color:var(--t3);}
+/* ── SCORE RING ── */
+.ring-wrap{position:relative;width:min(60vw,220px);height:min(60vw,220px);margin:0 auto;}
+#ring-canvas-main{position:absolute;inset:0;width:100%;height:100%;}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.ring-score{font-family:'Lilita One',cursive;font-size:clamp(2rem,10vw,3rem);color:var(--tx);line-height:1;}
+.ring-label{font-family:'Oswald',sans-serif;font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--t3);}
+.ring-grade{font-family:'Roboto Mono',monospace;font-size:0.9rem;color:var(--deep);margin-top:2px;}
 
-/* ── TIMER ── */
-.timer-wrap{
-  display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0;
-}
-.timer-circle{
-  position:relative;width:160px;height:160px;
-}
-#timer-svg{position:absolute;inset:0;width:100%;height:100%;}
-.timer-center{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-}
-.timer-time{font-family:'Lilita One',cursive;font-size:2.2rem;color:var(--tx);line-height:1;}
-.timer-lbl{font-family:'Oswald',sans-serif;font-size:0.55rem;letter-spacing:3px;text-transform:uppercase;color:var(--t3);}
+/* ── HIPNOGRAMA ── */
+.hipo-container{width:100%;background:var(--s2);border-radius:8px;padding:12px;border:1px solid var(--bd);}
+.hipo-stages{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.hipo-row{display:flex;align-items:center;gap:8px;}
+.hipo-stage-lbl{font-family:'Roboto Mono',monospace;font-size:0.52rem;color:var(--t3);width:44px;text-align:right;flex-shrink:0;letter-spacing:1px;text-transform:uppercase;}
+.hipo-bar-wrap{flex:1;height:18px;background:var(--s3);border-radius:3px;overflow:hidden;position:relative;}
+.hipo-segment{height:100%;display:inline-block;border-radius:2px;transition:width 1s ease;}
+.hipo-axis{display:flex;justify-content:space-between;font-family:'Roboto Mono',monospace;font-size:0.5rem;color:var(--t3);padding:0 52px 0 52px;}
 
-/* ── PROGRESSO ── */
-.progress-bar{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;}
-.progress-fill{height:100%;background:var(--grn);border-radius:3px;transition:width 1s linear;}
+/* ── INPUTS ── */
+.inp-row{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--s2);border-radius:8px;padding:9px 10px;border:1px solid var(--bd);}
+.inp-lbl{font-family:'Roboto Mono',monospace;font-size:0.58rem;letter-spacing:0;text-transform:uppercase;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%;}
+.inp-val{background:var(--s1);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'Lilita One',cursive;font-size:1rem;padding:4px 6px;outline:none;text-align:center;width:52px;}
+.inp-val:focus{border-color:var(--deep);}
+.inp-unit{font-family:'Oswald',sans-serif;font-size:0.72rem;color:var(--t3);letter-spacing:1px;}
 
-/* ── BT BUTTON ── */
-.bt-btn{
-  width:100%;padding:14px;border-radius:10px;font-family:'Lilita One',cursive;
-  font-size:1.1rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s;
-  border:2px solid var(--grn-m);background:var(--grn-d);color:var(--grn);
-}
-.bt-btn.conectado{
-  background:var(--grn);color:#000;border-color:var(--grn);
-}
-.bt-btn:active{opacity:0.8;}
+.inp-pair{display:flex;align-items:center;gap:3px;flex-shrink:0;}
 
 /* ── BOTÕES ── */
-.btn-primary{width:100%;padding:15px;background:var(--grn);color:#000;border:none;border-radius:10px;font-family:'Lilita One',cursive;font-size:1.1rem;letter-spacing:1px;cursor:pointer;transition:opacity 0.15s;}
+.btn-primary{width:100%;padding:15px;background:var(--deep);color:#fff;border:none;border-radius:10px;font-family:'Lilita One',cursive;font-size:1.1rem;letter-spacing:1px;cursor:pointer;transition:opacity 0.15s;}
 .btn-primary:active{opacity:0.8;}
-.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
-.btn-secondary{width:100%;padding:12px;background:transparent;color:var(--t2);border:1px solid var(--bd);border-radius:10px;font-family:'Oswald',sans-serif;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+.btn-secondary{width:100%;padding:12px;background:transparent;color:var(--t2);border:1px solid var(--bd);border-radius:10px;font-family:'Oswald',sans-serif;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background 0.15s;}
+.btn-secondary:active{background:var(--s2);}
 
-/* ── MÉTRICAS GRID ── */
-.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.metric-item{background:var(--s2);border-radius:8px;padding:10px;border:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;}
-.metric-val{font-family:'Roboto Mono',monospace;font-size:1.1rem;font-weight:700;}
-.metric-lbl{font-family:'Oswald',sans-serif;font-size:0.52rem;letter-spacing:1px;text-transform:uppercase;color:var(--t3);}
+/* ── FASE BOTÕES ── */
+.tipo-row{display:flex;gap:6px;}
+.tipo-btn{flex:1;padding:10px 6px;border-radius:8px;font-family:'Roboto Mono',monospace;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;border:1px solid var(--bd);background:var(--s2);color:var(--t3);cursor:pointer;transition:all 0.15s;text-align:center;}
+.tipo-btn.ativo-dia{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.4);color:#f87171;}
+.tipo-btn.ativo-noite{background:var(--deep-g);border-color:var(--deep-m);color:var(--deep);}
 
-/* ── GUIA RESPIRAÇÃO ── */
-.breath-guide{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  padding:10px;background:var(--s2);border-radius:8px;border:1px solid var(--bd);
-}
-.breath-circle{
-  width:60px;height:60px;border-radius:50%;
-  background:var(--grn-d);border:2px solid var(--grn-m);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform 4s ease-in-out, background 4s ease;
-  font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:1px;
-  text-transform:uppercase;color:var(--grn);
-}
-.breath-circle.inhale{transform:scale(1.3);background:rgba(16,185,129,0.15);}
-.breath-circle.exhale{transform:scale(0.85);background:var(--grn-d);}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.stat-item{background:var(--s2);border-radius:8px;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--bd);}
+.stat-val{font-family:'Roboto Mono',monospace;font-size:1.0rem;font-weight:700;}
+.stat-lbl{font-family:'Oswald',sans-serif;font-size:0.52rem;letter-spacing:1px;text-transform:uppercase;color:var(--t3);text-align:center;}
 
-/* ── HISTÓRICO ── */
+/* ── FASES BARRAS ── */
+.phase-bars{display:flex;flex-direction:column;gap:6px;}
+.phase-row{display:flex;align-items:center;gap:8px;}
+.phase-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.phase-name{font-family:'Roboto Mono',monospace;font-size:0.58rem;color:var(--t2);width:52px;flex-shrink:0;}
+.phase-bar-wrap{flex:1;height:8px;background:var(--s3);border-radius:4px;overflow:hidden;}
+.phase-bar{height:100%;border-radius:4px;transition:width 1s ease;}
+.phase-pct{font-family:'Roboto Mono',monospace;font-size:0.58rem;color:var(--t3);width:30px;text-align:right;flex-shrink:0;}
+
+/* ── SENSOR BADGE ── */
+.sensor-row{display:flex;gap:6px;flex-wrap:wrap;}
+.sensor-badge{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:5px 9px;}
+.sensor-badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sensor-badge-txt{font-family:'Roboto Mono',monospace;font-size:0.6rem;color:var(--t2);}
+
+/* ── IA ── */
+.ai-header{display:flex;align-items:center;gap:9px;}
+.ai-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--deep),var(--rem));display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0;}
+.ai-titulo{font-family:'Oswald',sans-serif;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;}
+.ai-fonte{font-family:'Roboto Mono',monospace;font-size:0.54rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-top:1px;}
+.ai-body{font-size:0.78rem;color:var(--t2);line-height:1.75;min-height:48px;}
+.ai-load{display:flex;align-items:center;gap:8px;color:var(--t3);font-size:0.72rem;}
+.ai-dots span{display:inline-block;width:4px;height:4px;border-radius:1px;animation:aiD 1.2s ease-in-out infinite;}
+.ai-dots span:nth-child(1){background:var(--deep);}
+.ai-dots span:nth-child(2){background:var(--rem);animation-delay:0.2s;}
+.ai-dots span:nth-child(3){background:var(--acc);animation-delay:0.4s;}
+@keyframes aiD{0%,80%,100%{transform:scale(0.5);opacity:0.3;}40%{transform:scale(1);opacity:1;}}
+
+/* ── HIST ── */
 .hist-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:8px;border:1px solid var(--bd);}
 .hi-date{display:flex;flex-direction:column;gap:1px;flex-shrink:0;width:28px;}
 .hi-d{font-family:'Oswald',sans-serif;font-size:1.05rem;line-height:1;}
 .hi-m{font-family:'Roboto Mono',monospace;font-size:0.52rem;color:var(--t3);}
 .hi-bar{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
-.hi-meta{font-family:'Roboto Mono',monospace;font-size:0.56rem;color:var(--t2);}
+.hi-hipo{display:flex;height:8px;border-radius:3px;overflow:hidden;gap:1px;}
+.hi-meta{font-family:'Roboto Mono',monospace;font-size:0.54rem;color:var(--t2);}
 .hi-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
-.hi-rmssd{font-family:'Oswald',sans-serif;font-size:1.0rem;}
-.hi-status{font-family:'Roboto Mono',monospace;font-size:0.52rem;}
-.del-btn{font-family:'Roboto Mono',monospace;font-size:0.52rem;color:var(--red);background:rgba(239,68,68,0.1);padding:3px 6px;border-radius:3px;border:1px solid rgba(239,68,68,0.3);}
+.hi-score{font-family:'Oswald',sans-serif;font-size:1.1rem;}
+.hi-grade{font-family:'Roboto Mono',monospace;font-size:0.55rem;color:var(--t3);}
+.del-btn{font-family:'Roboto Mono',monospace;font-size:0.52rem;color:var(--wake);background:rgba(239,68,68,0.1);padding:3px 6px;border-radius:3px;border:1px solid rgba(239,68,68,0.3);}
 .hist-empty{font-size:0.75rem;color:var(--t3);text-align:center;padding:16px 0;line-height:1.7;}
-
-/* ── IA ── */
-.ai-header{display:flex;align-items:center;gap:9px;}
-.ai-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--grn),var(--grn2));display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0;}
-.ai-titulo{font-family:'Oswald',sans-serif;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;}
-.ai-fonte{font-family:'Roboto Mono',monospace;font-size:0.54rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-top:1px;}
-.ai-body{font-size:0.78rem;color:var(--t2);line-height:1.75;min-height:48px;}
-.ai-dots span{display:inline-block;width:4px;height:4px;border-radius:1px;animation:aiD 1.2s ease-in-out infinite;}
-.ai-dots span:nth-child(1){background:var(--grn);}
-.ai-dots span:nth-child(2){background:var(--grn2);animation-delay:0.2s;}
-.ai-dots span:nth-child(3){background:var(--grn3);animation-delay:0.4s;}
-@keyframes aiD{0%,80%,100%{transform:scale(0.5);opacity:0.3;}40%{transform:scale(1);opacity:1;}}
 
 /* ── ALERTA ── */
 .alert-box{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:8px;font-size:0.72rem;line-height:1.5;}
-.alert-grn{background:var(--grn-d);border:1px solid var(--grn-m);color:#6ee7b7;}
+.alert-deep{background:var(--deep-g);border:1px solid var(--deep-m);color:#93c5fd;}
+.alert-rem{background:var(--rem-g);border:1px solid var(--rem-m);color:#c4b5fd;}
 .alert-warn{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.3);color:#fde047;}
-.alert-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
+.alert-crit{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;}
 
-/* ── TENDÊNCIA MINI ── */
-.trend-bars{display:flex;align-items:flex-end;gap:3px;height:40px;}
-.trend-bar{flex:1;border-radius:2px 2px 0 0;min-height:4px;transition:height 0.5s ease;}
+/* ── STATS HOME ── */
+.stats-home{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.sh-item{background:var(--s2);border-radius:8px;padding:10px;border:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;}
+.sh-val{font-family:'Roboto Mono',monospace;font-size:1.1rem;font-weight:700;}
+.sh-lbl{font-family:'Oswald',sans-serif;font-size:0.55rem;letter-spacing:1px;text-transform:uppercase;color:var(--t3);}
 </style>
 </head>
 <body>
@@ -197,26 +185,24 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 
 <!-- SPLASH -->
 <div id="splash">
-  <svg class="sp-icon" viewBox="0 0 100 100">
-    <rect x="28" y="18" width="44" height="68" rx="6" fill="none" stroke="#10b981" stroke-width="4"/>
-    <rect x="40" y="12" width="20" height="10" rx="3" fill="#10b981"/>
-    <rect x="32" y="58" width="36" height="22" rx="4" fill="#10b981" opacity="0.9"/>
-    <polyline points="44,52 50,38 50,54 56,40" fill="none" stroke="#09090b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <svg class="sp-waves" viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="25" x2="20" y2="25" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>
+    <polyline points="20,25 28,25 33,10 39,40 44,5 50,42 55,25 68,25" fill="none" stroke="#6d28d9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="68" y1="25" x2="120" y2="25" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>
   </svg>
-  <div class="sp-name">MAX.CORE RECOVERY</div>
-  <div class="sp-sub">HRV Matinal • Recuperação</div>
+  <div class="sp-name">MAX.CORE SLEEP</div>
+  <div class="sp-sub">Análise Dual-Sensor • HRV × Sono</div>
 </div>
 
 <div class="app" id="main-app">
   <div class="hdr">
     <div class="hlogo">
-      <svg width="18" height="18" viewBox="0 0 100 100">
-        <rect x="28" y="16" width="44" height="68" rx="6" fill="none" stroke="#10b981" stroke-width="6"/>
-        <rect x="40" y="10" width="20" height="10" rx="3" fill="#10b981"/>
-        <rect x="32" y="56" width="36" height="22" rx="4" fill="#10b981" opacity="0.9"/>
-        <polyline points="44,50 50,36 50,52 56,38" fill="none" stroke="#09090b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="22" height="14" viewBox="0 0 120 50">
+        <line x1="0" y1="25" x2="20" y2="25" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"/>
+        <polyline points="20,25 28,25 33,10 39,40 44,5 50,42 55,25 68,25" fill="none" stroke="#6d28d9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="68" y1="25" x2="120" y2="25" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round"/>
       </svg>
-      <span class="hname">MAX.CORE RECOVERY</span>
+      <span class="hname">MAX.CORE SLEEP</span>
     </div>
     <span class="hdate" id="hdr-date"></span>
   </div>
@@ -226,151 +212,228 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
     <!-- ═══ HOME ═══ -->
     <div id="sc-home" style="display:flex;flex-direction:column;gap:10px;">
 
-      <!-- Status principal -->
-      <div class="status-card" id="status-card">
-        <div class="lbl">Estado do Sistema Nervoso</div>
-        <div class="status-icon-wrap">
-          <svg class="status-rings" id="status-svg" viewBox="0 0 100 100">
-            <rect x="28" y="16" width="44" height="68" rx="6" fill="none" stroke="#10b98130" stroke-width="3"/>
-            <rect x="40" y="10" width="20" height="10" rx="3" fill="#10b98150"/>
-            <rect id="status-ring" x="32" y="56" width="36" height="22" rx="4" fill="#10b981" opacity="0.15"
-              style="transition:opacity 0.5s,fill 0.5s;"/>
-            <rect id="status-dot" x="32" y="56" width="0" height="22" rx="4" fill="#10b981"
-              style="transition:width 1s ease,fill 0.5s;"/>
+      <!-- último sono resumo -->
+      <div class="card" id="home-ultimo" style="display:none;">
+        <div class="lbl">Último Sono</div>
+        <div class="stats-home" id="home-stats-grid"></div>
+        <div id="home-mini-hipo" style="height:24px;background:var(--s2);border-radius:5px;overflow:hidden;display:flex;gap:1px;"></div>
+      </div>
+
+      <!-- card boas-vindas se sem histórico -->
+      <div class="card" id="home-welcome">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;">
+          <svg width="64" height="32" viewBox="0 0 120 50">
+            <line x1="0" y1="25" x2="20" y2="25" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+            <polyline points="20,25 28,25 33,10 39,40 44,5 50,42 55,25 68,25" fill="none" stroke="#6d28d9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="68" y1="25" x2="120" y2="25" stroke="#1d4ed8" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
           </svg>
+          <div style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);">Pronto para analisar seu sono?</div>
         </div>
-        <div class="status-label" id="status-label">--</div>
-        <div class="rmssd-display">
-          <div class="rmssd-val" id="home-rmssd">--</div>
-          <div class="rmssd-unit">ms RMSSD</div>
+        <div class="sensor-row">
+
         </div>
-        <div class="baseline-row">
-          <div class="bl-item"><div class="bl-val" id="home-lnrmssd" style="color:var(--grn)">--</div><div class="bl-lbl">LnRMSSD</div></div>
-          <div class="bl-item"><div class="bl-val" id="home-baseline" style="color:var(--t2)">--</div><div class="bl-lbl">Baseline</div></div>
-          <div class="bl-item"><div class="bl-val" id="home-desvio" style="color:var(--t2)">--</div><div class="bl-lbl">Desvio</div></div>
-        </div>
-        <div class="status-sub" id="status-sub">Faça a medição matinal para ver seu estado</div>
       </div>
 
-      <!-- Tendência -->
-      <div class="card" id="trend-card" style="display:none;">
-        <div class="lbl">Tendência — Últimas medições</div>
-        <div class="trend-bars" id="trend-bars"></div>
-        <div style="display:flex;justify-content:space-between;font-family:'Roboto Mono',monospace;font-size:0.5rem;color:var(--t3);margin-top:2px;" id="trend-labels"></div>
+      <!-- histórico resumo -->
+      <div class="card" id="home-hist-card" style="display:none;">
+        <div class="lbl">Últimas Noites</div>
+        <div id="home-hist-lista"></div>
       </div>
 
-      <button class="btn-primary" onclick="showScreen('sc-medir')">📡 Iniciar Medição Matinal</button>
-      <button class="btn-secondary" onclick="showScreen('sc-historico')">📋 Ver Histórico</button>
+      <button class="btn-primary" onclick="showScreen('sc-registrar')">+ Registrar Sono</button>
 
     </div>
 
-    <!-- ═══ MEDIR ═══ -->
-    <div id="sc-medir" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+    <!-- ═══ REGISTRAR ═══ -->
+    <div id="sc-registrar" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
 
-      <!-- BT -->
+      <!-- tipo de sono -->
       <div class="card">
-        <div class="lbl">Bluetooth</div>
-        <button class="bt-btn" id="bt-btn" onclick="toggleBT()">📡 Conectar</button>
-        <div style="font-family:'Roboto Mono',monospace;font-size:0.58rem;color:var(--t3);text-align:center;" id="bt-status">Desconectado</div>
-        <div style="background:var(--s2);border-radius:8px;padding:8px 12px;border:1px solid var(--bd);">
-          <div style="font-family:'Roboto Mono',monospace;font-size:0.6rem;color:var(--t3);letter-spacing:1px;">FC Instantânea</div>
-          <div style="font-family:'Lilita One',cursive;font-size:1.8rem;color:var(--tx);" id="fc-live">-- <span style="font-size:0.7rem;color:var(--t3);">bpm</span></div>
+        <div class="lbl">Tipo de Sono</div>
+        <div class="tipo-row">
+          <button class="tipo-btn" id="btn-dia" onclick="setTipo('dia')">☀️ Dormi de Dia</button>
+          <button class="tipo-btn ativo-noite" id="btn-noite" onclick="setTipo('noite')">🌙 Dormi de Noite</button>
         </div>
       </div>
 
-      <!-- Timer e guia -->
-      <div class="card" id="timer-card">
-        <div class="lbl">Protocolo Matinal — 5 Minutos Deitado</div>
-
-        <!-- Guia de respiração -->
-        <div class="breath-guide">
-          <div class="breath-circle" id="breath-circle">Inspire</div>
-          <div style="font-family:'Roboto Mono',monospace;font-size:0.55rem;color:var(--t3);letter-spacing:2px;text-transform:uppercase;" id="breath-lbl">Respiração natural</div>
-        </div>
-
-        <!-- Timer circular -->
-        <div class="timer-wrap">
-          <div class="timer-circle">
-            <svg id="timer-svg" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="44" fill="none" stroke="#222228" stroke-width="6"/>
-              <circle id="timer-arc" cx="50" cy="50" r="44" fill="none" stroke="#10b981" stroke-width="6"
-                stroke-dasharray="276.46" stroke-dashoffset="0" stroke-linecap="round"
-                transform="rotate(-90 50 50)" style="transition:stroke-dashoffset 1s linear;"/>
-            </svg>
-            <div class="timer-center">
-              <div class="timer-time" id="timer-time">5:00</div>
-              <div class="timer-lbl">restante</div>
-            </div>
+      <!-- tempo total -->
+      <div class="card">
+        <div class="lbl">Tempo Total de Sono</div>
+        <div class="inp-row">
+          <span class="inp-lbl" style="color:var(--light)">Leve 🔵</span>
+          <div class="inp-pair">
+            <input type="number" class="inp-val" id="in-leve-h" oninput="atualizarTotal()" value="4" min="0" max="24" style="color:var(--light)">
+            <span class="inp-unit">H</span>
+            <input type="number" class="inp-val" id="in-leve-m" oninput="atualizarTotal()" value="10" min="0" max="59" style="color:var(--light)">
+            <span class="inp-unit">M</span>
           </div>
         </div>
-
-        <!-- RMSSD em tempo real -->
-        <div style="background:var(--s2);border-radius:10px;padding:12px;border:1px solid var(--grn-m);display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-family:'Roboto Mono',monospace;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);">RMSSD Tempo Real</div>
-            <div style="font-family:'Roboto Mono',monospace;font-size:0.54rem;color:var(--t3);margin-top:2px;" id="rr-count">Aguardando R-R intervals...</div>
+        <div class="inp-row">
+          <span class="inp-lbl">SWS 🟦</span>
+          <div class="inp-pair">
+            <input type="number" class="inp-val" id="in-deep-h" oninput="atualizarTotal()" value="1" min="0" max="12" style="color:var(--deep)">
+            <span class="inp-unit">H</span>
+            <input type="number" class="inp-val" id="in-deep-m" oninput="atualizarTotal()" value="20" min="0" max="59" style="color:var(--deep)">
+            <span class="inp-unit">M</span>
           </div>
-          <div style="font-family:'Lilita One',cursive;font-size:2.2rem;color:var(--grn);" id="rmssd-live">--</div>
         </div>
-
-        <div style="background:var(--s2);border-radius:8px;padding:10px 12px;border:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;">
-          <div style="font-family:'Roboto Mono',monospace;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--t3);">Ou insira RMSSD manual</div>
-          <input type="number" id="rmssd-manual" min="10" max="200" placeholder="ex: 55"
-            style="-webkit-appearance:none;background:var(--s1);border:1px solid var(--bd);border-radius:6px;color:var(--grn);font-family:'Lilita One',cursive;font-size:1.1rem;padding:5px 8px;outline:none;text-align:center;width:80px;">
+        <div class="inp-row">
+          <span class="inp-lbl">REM 🟣</span>
+          <div class="inp-pair">
+            <input type="number" class="inp-val" id="in-rem-h" oninput="atualizarTotal()" value="1" min="0" max="12" style="color:var(--rem)">
+            <span class="inp-unit">H</span>
+            <input type="number" class="inp-val" id="in-rem-m" oninput="atualizarTotal()" value="30" min="0" max="59" style="color:var(--rem)">
+            <span class="inp-unit">M</span>
+          </div>
         </div>
-        <button class="btn-primary" id="btn-iniciar" onclick="iniciarMedicao()">▶ Iniciar 5 Minutos</button>
-        <button class="btn-secondary" id="btn-parar" onclick="pararMedicao()" style="display:none;">⏹ Encerrar</button>
+        <div style="background:var(--s2);border-radius:8px;padding:9px 12px;border:1px solid var(--bd);font-family:'Roboto Mono',monospace;font-size:0.62rem;color:var(--t3);display:flex;justify-content:space-between;">
+          <span>Total (calculado):</span>
+          <span id="lbl-total" style="color:var(--acc)">--</span>
+        </div>
       </div>
 
+      <!-- sensores -->
+      <div class="card">
+        <div class="lbl">Sensores Fisiológicos</div>
+        <div class="sensor-row" style="margin-bottom:4px;">
+        </div>
+        <div class="inp-row">
+          <span class="inp-lbl" style="color:#c4b5fd">RMSSD (ms)</span>
+          <input type="number" class="inp-val" id="in-rmssd" value="55" min="0" style="color:#c4b5fd;width:72px;">
+        </div>
+        <div class="sensor-row" style="margin-top:6px;margin-bottom:4px;">
+        </div>
+        <div class="inp-row">
+          <span class="inp-lbl" style="color:#93c5fd">SpO2 (%)</span>
+          <input type="number" class="inp-val" id="in-spo2" value="95" min="80" max="100" style="color:#93c5fd;width:72px;">
+        </div>
+        <div class="inp-row">
+          <span class="inp-lbl">FC Noturna</span>
+          <input type="number" class="inp-val" id="in-fc-noite" value="52" min="30" max="100" style="width:72px;">
+        </div>
+        <div class="inp-row">
+          <span class="inp-lbl">Resp. (rpm)</span>
+          <input type="number" class="inp-val" id="in-resp" value="14" min="8" max="30" style="width:72px;">
+        </div>
+        <div class="inp-row">
+          <span class="inp-lbl">Despertares</span>
+          <input type="number" class="inp-val" id="in-despertares" value="1" min="0" max="20" style="width:72px;">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="analisarSono()">🔬 Analisar Sono</button>
       <button class="btn-secondary" onclick="showScreen('sc-home')">← Voltar</button>
 
     </div>
 
-    <!-- ═══ RESULTADO ═══ -->
-    <div id="sc-resultado" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+    <!-- ═══ RELATÓRIO ═══ -->
+    <div id="sc-relatorio" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
 
-      <!-- Score resultado -->
-      <div class="status-card" id="res-status-card">
-        <div class="lbl" id="res-data-txt"></div>
-        <div class="status-label" id="res-status-label">--</div>
-        <div class="rmssd-display">
-          <div class="rmssd-val" id="res-rmssd">--</div>
-          <div class="rmssd-unit">ms RMSSD</div>
+      <!-- Score principal -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div class="lbl" id="rep-data-txt"></div>
+          <div class="sensor-row">
+
+          </div>
         </div>
-        <div class="baseline-row">
-          <div class="bl-item"><div class="bl-val" id="res-lnrmssd" style="color:var(--grn)">--</div><div class="bl-lbl">LnRMSSD</div></div>
-          <div class="bl-item"><div class="bl-val" id="res-baseline" style="color:var(--t2)">--</div><div class="bl-lbl">Baseline</div></div>
-          <div class="bl-item"><div class="bl-val" id="res-desvio" style="color:var(--t2)">--</div><div class="bl-lbl">Desvio</div></div>
+
+        <div class="ring-wrap">
+          <canvas id="ring-canvas-main"></canvas>
+          <div class="ring-center">
+            <div class="ring-score" id="rep-score">--</div>
+            <div class="ring-label">sono score</div>
+            <div class="ring-grade" id="rep-grade">--</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-val" id="rs-total" style="color:var(--acc)">--</div><div class="stat-lbl">Duração</div></div>
+          <div class="stat-item"><div class="stat-val" id="rs-efic" style="color:var(--deep)">--%</div><div class="stat-lbl">Eficiência</div></div>
+          <div class="stat-item"><div class="stat-val" id="rs-hrv-efi" style="color:var(--rem)">--%</div><div class="stat-lbl">HRV Efi.</div></div>
         </div>
       </div>
 
-      <!-- Métricas detalhadas -->
+      <!-- Hipnograma -->
       <div class="card">
-        <div class="lbl">Análise HRV</div>
-        <div class="metrics-grid" id="res-metrics"></div>
+        <div class="lbl">Hipnograma Dual-Sensor</div>
+        <div class="hipo-container">
+          <div class="hipo-stages">
+            <div class="hipo-row">
+              <span class="hipo-stage-lbl" style="color:var(--wake)">Vigília</span>
+              <div class="hipo-bar-wrap" id="hipo-wake"></div>
+            </div>
+            <div class="hipo-row">
+              <span class="hipo-stage-lbl" style="color:var(--light)">Leve</span>
+              <div class="hipo-bar-wrap" id="hipo-light"></div>
+            </div>
+            <div class="hipo-row">
+              <span class="hipo-stage-lbl" style="color:var(--rem)">REM</span>
+              <div class="hipo-bar-wrap" id="hipo-rem"></div>
+            </div>
+            <div class="hipo-row">
+              <span class="hipo-stage-lbl" style="color:var(--deep)">Profundo</span>
+              <div class="hipo-bar-wrap" id="hipo-deep"></div>
+            </div>
+          </div>
+          <div class="hipo-axis" id="hipo-axis-labels"></div>
+        </div>
+      </div>
+
+      <!-- Fases detalhadas -->
+      <div class="card">
+        <div class="lbl">Arquitetura do Sono</div>
+        <div class="phase-bars">
+          <div class="phase-row">
+            <div class="phase-dot" style="background:var(--deep)"></div>
+            <span class="phase-name">Profundo</span>
+            <div class="phase-bar-wrap"><div class="phase-bar" id="bar-deep" style="background:var(--deep);width:0%"></div></div>
+            <span class="phase-pct" id="pct-deep" style="color:var(--deep)">0%</span>
+          </div>
+          <div class="phase-row">
+            <div class="phase-dot" style="background:var(--rem)"></div>
+            <span class="phase-name">REM</span>
+            <div class="phase-bar-wrap"><div class="phase-bar" id="bar-rem" style="background:var(--rem);width:0%"></div></div>
+            <span class="phase-pct" id="pct-rem" style="color:var(--rem)">0%</span>
+          </div>
+          <div class="phase-row">
+            <div class="phase-dot" style="background:var(--light)"></div>
+            <span class="phase-name">Leve</span>
+            <div class="phase-bar-wrap"><div class="phase-bar" id="bar-light" style="background:var(--light);width:0%"></div></div>
+            <span class="phase-pct" id="pct-light" style="color:var(--light)">0%</span>
+          </div>
+        </div>
+
+        <!-- Alvos científicos -->
+        <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-family:'Roboto Mono',monospace;font-size:0.54rem;color:var(--t3);">Alvos: Profundo 15-25% · REM 20-25% (AASM 2025)</div>
+        </div>
+      </div>
+
+      <!-- Sensores cruzados -->
+      <div class="card">
+        <div class="lbl">Cruzamento Dual-Sensor</div>
+        <div style="display:flex;flex-direction:column;gap:6px;" id="sensor-cross"></div>
       </div>
 
       <!-- Alertas -->
-      <div id="res-alertas"></div>
+      <div id="alertas-container" style="display:flex;flex-direction:column;gap:6px;"></div>
 
       <!-- IA -->
       <div class="card">
         <div class="ai-header">
-          <div class="ai-icon">🧬</div>
+          <div class="ai-icon">🧠</div>
           <div>
             <div class="ai-titulo">Análise Científica</div>
-            <div class="ai-fonte">HRV4Training · PubMed 2025 · Marco Altini</div>
+            <div class="ai-fonte">Dual-Sensor · PubMed 2025</div>
           </div>
         </div>
         <div class="ai-body" id="ai-body">
-          <div style="display:flex;align-items:center;gap:8px;color:var(--t3);font-size:0.72rem;">
-            <div class="ai-dots"><span></span><span></span><span></span></div>
-            Analisando HRV...
-          </div>
+          <div class="ai-load"><div class="ai-dots"><span></span><span></span><span></span></div> Cruzando sensores...</div>
         </div>
       </div>
 
-      <button class="btn-primary" id="btn-salvar-res" onclick="salvarMedicao()">💾 Salvar Medição</button>
+      <button class="btn-primary" id="btn-salvar" onclick="salvarSono()">💾 Salvar Esta Noite</button>
       <button class="btn-secondary" onclick="showScreen('sc-home')">← Voltar</button>
 
     </div>
@@ -378,8 +441,8 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
     <!-- ═══ HISTÓRICO ═══ -->
     <div id="sc-historico" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
       <div class="card">
-        <div class="lbl">Histórico HRV</div>
-        <div id="hist-lista"><div class="hist-empty">Nenhuma medição registrada ainda.</div></div>
+        <div class="lbl">Histórico de Sono</div>
+        <div id="hist-lista"><div class="hist-empty">Nenhuma noite registrada ainda.</div></div>
       </div>
       <button class="btn-secondary" onclick="showScreen('sc-home')">← Voltar</button>
     </div>
@@ -388,23 +451,18 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 </div>
 
 <script>
-// ══ ESTADO ════════════════════════════════════════════════
-const ST = {
-  btOn: false, btDevice: null,
-  rrIntervals: [], rmssd: null, fcAtual: null,
-  timer: null, timerSec: 300, timerAtivo: false,
-  breathTimer: null,
-  sessao: null,
-};
+// ══ ESTADO ═══════════════════════════════════════════════
+const ST = { tipo: 'noite', sessao: null };
 
-// ══ STORAGE ══════════════════════════════════════════════
-function loadMedicoes() {
-  try { const s = JSON.parse(localStorage.getItem('recovery_v1')); return Array.isArray(s) ? s : []; }
+function loadSonos() {
+  try { const s = JSON.parse(localStorage.getItem('sleep_v1')); return Array.isArray(s) ? s : []; }
   catch(e) { return []; }
 }
-function saveMedicoes(arr) { localStorage.setItem('recovery_v1', JSON.stringify(arr.slice(0,90))); }
+function saveSonos(arr) {
+  localStorage.setItem('sleep_v1', JSON.stringify(arr.slice(0, 90)));
+}
 
-// ══ CANVAS FUNDO — RADAR / ONDAS ════════════════════════
+// ══ CANVAS FUNDO — ONDAS CEREBRAIS ═════════════════════
 function initBG() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -413,46 +471,51 @@ function initBG() {
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize(); window.addEventListener('resize', resize);
 
-  // Ondas circulares pulsando
-  const pulses = Array.from({length: 5}, (_, i) => ({
-    r: 20 + i * 35, speed: 0.008 + i * 0.003, phase: i * 1.2,
-    alpha: 0.03 - i * 0.004, width: 1.5 - i * 0.2
-  }));
+  // 3 tipos de ondas cerebrais: Delta (0.5-4Hz), Theta (4-8Hz), Alpha (8-12Hz)
+  const waves = [
+    { freq: 0.012, amp: 18, y: 0.22, color: '#1d4ed8', alpha: 0.06, width: 1.5, phase: 0 },
+    { freq: 0.028, amp: 12, y: 0.45, color: '#6d28d9', alpha: 0.05, width: 1.2, phase: 1.2 },
+    { freq: 0.018, amp: 22, y: 0.68, color: '#1d4ed8', alpha: 0.04, width: 1.0, phase: 2.4 },
+    { freq: 0.045, amp: 8,  y: 0.85, color: '#6d28d9', alpha: 0.035, width: 0.8, phase: 0.8 },
+    { freq: 0.008, amp: 30, y: 0.33, color: '#2dd4bf', alpha: 0.025, width: 0.7, phase: 3.1 },
+  ];
 
-  // Partículas verdes
-  const particles = Array.from({length: 30}, () => ({
+  // Partículas (estrelas dormindo)
+  const particles = Array.from({length: 40}, () => ({
     x: Math.random() * 1600, y: Math.random() * 2400,
-    vx: (Math.random()-0.5)*0.1, vy: (Math.random()-0.5)*0.08,
-    r: 0.5 + Math.random() * 1.2,
-    alpha: 0.02 + Math.random() * 0.05,
+    vx: (Math.random()-0.5)*0.12, vy: (Math.random()-0.5)*0.08,
+    r: 0.5 + Math.random() * 1.5,
+    alpha: 0.02 + Math.random() * 0.06,
     pulse: Math.random() * Math.PI * 2,
-    pulseSpeed: 0.006 + Math.random() * 0.01,
+    pulseSpeed: 0.005 + Math.random() * 0.01,
   }));
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
     t += 0.006;
-    const cx = W/2, cy = H/2;
 
-    // Ondas circulares do centro
-    pulses.forEach(p => {
-      const r = p.r + Math.sin(t * p.speed * 100 + p.phase) * 8;
+    // Ondas cerebrais
+    waves.forEach(w => {
       ctx.beginPath();
-      ctx.arc(cx, cy, r + t * 15 % (Math.max(W,H)), 0, Math.PI*2);
-      ctx.strokeStyle = `rgba(16,185,129,${p.alpha * (0.5 + Math.sin(t + p.phase) * 0.5)})`;
-      ctx.lineWidth = p.width;
+      for (let x = 0; x <= W; x += 2) {
+        const y = H * w.y + Math.sin(x * w.freq + t + w.phase) * w.amp
+                          + Math.sin(x * w.freq * 2.3 + t * 1.4 + w.phase) * w.amp * 0.4;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = w.color + Math.floor(w.alpha * 255).toString(16).padStart(2,'0');
+      ctx.lineWidth = w.width;
       ctx.stroke();
     });
 
     // Partículas
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy; p.pulse += p.pulseSpeed;
-      if (p.x < -10) p.x = W+10; if (p.x > W+10) p.x = -10;
-      if (p.y < -10) p.y = H+10; if (p.y > H+10) p.y = -10;
+      if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
       const a = p.alpha * (0.5 + Math.sin(p.pulse) * 0.5);
       ctx.beginPath();
-      ctx.arc(p.x % W, p.y % H, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(16,185,129,${a})`;
+      ctx.arc(p.x % W, p.y % H, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(29,78,216,${a})`;
       ctx.fill();
     });
 
@@ -461,9 +524,38 @@ function initBG() {
   draw();
 }
 
+// ══ RING SCORE ══════════════════════════════════════════
+function drawRing(score) {
+  const canvas = document.getElementById('ring-canvas-main');
+  if (!canvas) return;
+  const wrap = canvas.closest('.ring-wrap');
+  const sz = wrap ? wrap.offsetWidth : 200;
+  canvas.width = sz; canvas.height = sz;
+  const ctx = canvas.getContext('2d');
+  const cx = sz/2, cy = sz/2, r = sz/2 - 16;
+  const CIRC = 2 * Math.PI * r;
+  const pct = Math.min(Math.max(score, 0), 100) / 100;
+  const cor = score < 40 ? '#ef4444' : score < 65 ? '#eab308' : score < 85 ? '#3b82f6' : '#2dd4bf';
+
+  ctx.clearRect(0, 0, sz, sz);
+  // Trilha
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.strokeStyle = '#222228'; ctx.lineWidth = 14; ctx.stroke();
+  // Glow
+  if (pct > 0.01) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + Math.PI*2*pct);
+    ctx.strokeStyle = cor + '30'; ctx.lineWidth = 26; ctx.lineCap = 'round'; ctx.stroke();
+  }
+  // Arco
+  if (pct > 0.01) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + Math.PI*2*pct);
+    ctx.strokeStyle = cor; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.stroke();
+  }
+}
+
 // ══ NAVEGAÇÃO ════════════════════════════════════════════
 function showScreen(id) {
-  ['sc-home','sc-medir','sc-resultado','sc-historico'].forEach(s => {
+  ['sc-home','sc-registrar','sc-relatorio','sc-historico'].forEach(s => {
     const el = document.getElementById(s);
     if (!el) return;
     if (s === id) { el.classList.remove('hidden'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
@@ -472,433 +564,473 @@ function showScreen(id) {
   try { document.querySelector('.scroll').scrollTop = 0; } catch(e) {}
   if (id === 'sc-home') renderHome();
   if (id === 'sc-historico') renderHistorico();
+  if (id === 'sc-registrar') atualizarTotal();
 }
 
-// ══ BLUETOOTH ════════════════════════════════════════════
-async function toggleBT() {
-  if (ST.btOn) { disconnectBT(); return; }
-  if (!navigator.bluetooth) { 
-    alert('Bluetooth não disponível.\n\nUse o Chrome no Android.\nCertifique-se que o site está em HTTPS.'); 
-    return; 
-  }
-  if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-    alert('Bluetooth requer HTTPS.\n\nAcesse via GitHub Pages (https://) não via arquivo local.');
-    return;
-  }
+// ══ TIPO DE SONO ══════════════════════════════════════════
+function setTipo(t) {
+  ST.tipo = t;
+  document.getElementById('btn-dia').className = t === 'dia' ? 'tipo-btn ativo-dia' : 'tipo-btn';
+  document.getElementById('btn-noite').className = t === 'noite' ? 'tipo-btn ativo-noite' : 'tipo-btn';
+}
+
+// ══ ATUALIZAR TOTAL CALCULADO ═══════════════════════════
+function atualizarTotal() {
   try {
-    const btn = document.getElementById('bt-btn');
-    btn.textContent = '🔄 Conectando...'; btn.disabled = true;
-    const dev = await navigator.bluetooth.requestDevice({
-      filters: [{services: ['heart_rate']}],
-      optionalServices: ['heart_rate']
-    });
-    ST.btDevice = dev;
-    const srv = await dev.gatt.connect();
-    const svc = await srv.getPrimaryService('heart_rate');
-    const chr = await svc.getCharacteristic('heart_rate_measurement');
-    await chr.startNotifications();
-    chr.addEventListener('characteristicvaluechanged', e => {
-      const v = e.target.value;
-      const flags = v.getUint8(0);
-      const bpm = (flags & 0x01) ? v.getUint16(1, true) : v.getUint8(1);
-      ST.fcAtual = bpm;
-      const el = document.getElementById('fc-live');
-      if (el) el.innerHTML = bpm + ' <span style="font-size:0.7rem;color:var(--t3);">bpm</span>';
-      // R-R intervals
-      let offset = (flags & 0x01) ? 3 : 2;
-      if (flags & 0x10) {
-        while (offset + 1 < v.byteLength) {
-          const rr = v.getUint16(offset, true) / 1024 * 1000;
-          if (rr > 300 && rr < 2000) {
-            ST.rrIntervals.push(rr);
-            if (ST.rrIntervals.length > 120) ST.rrIntervals.shift();
-            calcRMSSD();
-          }
-          offset += 2;
-        }
-      }
-    });
-    dev.addEventListener('gattserverdisconnected', disconnectBT);
-    ST.btOn = true;
-    btn.textContent = '✅ Conectado';
-    btn.className = 'bt-btn conectado';
-    btn.disabled = false;
-    document.getElementById('bt-status').textContent = 'Conectado — recebendo dados';
-    document.getElementById('bt-status').style.color = 'var(--grn)';
-  } catch(e) {
-    console.log('BT:', e);
-    document.getElementById('bt-btn').textContent = '📡 Conectar';
-    document.getElementById('bt-btn').disabled = false;
-    document.getElementById('bt-status').textContent = 'Falha na conexão — tente novamente';
+    const g = id => parseInt(document.getElementById(id)?.value||'0')||0;
+    const totalMin2 = (g('in-leve-h')*60 + g('in-leve-m'))
+                    + (g('in-deep-h')*60 + g('in-deep-m'))
+                    + (g('in-rem-h')*60  + g('in-rem-m'));
+    const el = document.getElementById('lbl-total');
+    if (el) el.textContent = Math.floor(totalMin2/60) + 'h ' + String(totalMin2%60).padStart(2,'0') + 'm';
+  } catch(e) {}
+}
+
+
+
+// ══ FORMATAR TEMPO ════════════════════════════════════════
+function fmtMin(min) {
+  if (!min || min <= 0) return '0h 00m';
+  return `${Math.floor(min/60)}h ${String(min%60).padStart(2,'0')}m`;
+}
+
+// ══ ANALISAR SONO ════════════════════════════════════════
+// ── Motor científico dual-sensor ──
+// Fontes embarcadas:
+// • Dial et al. 2025 (536 noites, CCC Oura/Whoop vs ECG)
+// • PMC5767731 — RMSSD por fase do sono (SWS < REM)
+// • Frontiers Neurology 2025 — privação sono reduz RMSSD (p<0.05)
+// • Lundstrom et al. EJSC 2025 — SWS% prediz performance R²=0.883
+// • PMC12166452 — SWS aumenta 40% após exercício extremo
+// • AASM 2025 — alvos de fases clínicos
+// • HRV4Training/Marco Altini — sensor validado vs referência científica
+// Perfil: 37 anos · 63kg músculo · turno pesado noturno
+
+function analisarSono() {
+  const leveMin   = (parseInt(document.getElementById('in-leve-h').value)||0)*60 + (parseInt(document.getElementById('in-leve-m').value)||0);
+  const deepMin   = (parseInt(document.getElementById('in-deep-h').value)||0)*60  + (parseInt(document.getElementById('in-deep-m').value)||0);
+  const remMin    = (parseInt(document.getElementById('in-rem-h').value)||0)*60   + (parseInt(document.getElementById('in-rem-m').value)||0);
+  const totalMin  = leveMin + deepMin + remMin;
+  const rmssd     = parseInt(document.getElementById('in-rmssd').value) || 50;
+  const spo2      = parseInt(document.getElementById('in-spo2').value) || 95;
+  const fcNoite   = parseInt(document.getElementById('in-fc-noite').value) || 55;
+  const resp      = parseFloat(document.getElementById('in-resp').value) || 14;
+  const despert   = parseInt(document.getElementById('in-despertares').value) || 0;
+  const tipo      = ST.tipo;
+
+  if (totalMin < 30) { alert('Insira um tempo de sono válido.'); return; }
+
+  const pctDeep  = totalMin > 0 ? (deepMin  / totalMin) * 100 : 0;
+  const pctREM   = totalMin > 0 ? (remMin   / totalMin) * 100 : 0;
+  const pctLeve  = totalMin > 0 ? (leveMin  / totalMin) * 100 : 0;
+
+  // ── SCORE SWS (peso 40%) ──
+  // Lundstrom EJSC 2025: SWS% R²=0.883 para performance
+  let scoreSWS = 0;
+  if (pctDeep >= 25) scoreSWS = 100;
+  else if (pctDeep >= 20) scoreSWS = 85 + ((pctDeep-20)/5)*15;
+  else if (pctDeep >= 15) scoreSWS = 65 + ((pctDeep-15)/5)*20;
+  else if (pctDeep >= 10) scoreSWS = 35 + ((pctDeep-10)/5)*30;
+  else scoreSWS = (pctDeep/10)*35;
+
+  // ── SCORE REM (peso 25%) ──
+  let scoreREM = 0;
+  if (pctREM >= 25) scoreREM = 100;
+  else if (pctREM >= 20) scoreREM = 80 + ((pctREM-20)/5)*20;
+  else if (pctREM >= 15) scoreREM = 55 + ((pctREM-15)/5)*25;
+  else if (pctREM >= 10) scoreREM = 25 + ((pctREM-10)/5)*30;
+  else scoreREM = (pctREM/10)*25;
+
+  // ── SCORE DURAÇÃO (peso 15%) ──
+  let scoreDur = 0;
+  if (totalMin >= 480) scoreDur = 100;
+  else if (totalMin >= 420) scoreDur = 80 + ((totalMin-420)/60)*20;
+  else if (totalMin >= 360) scoreDur = 55 + ((totalMin-360)/60)*25;
+  else if (totalMin >= 300) scoreDur = 30 + ((totalMin-300)/60)*25;
+  else scoreDur = (totalMin/300)*30;
+
+  // ── SCORE HRV NOTURNO (peso 15%) ──
+  // PMC5767731: RMSSD SWS < REM — RMSSD noturno ideal ~40-70ms para adultos
+  // Frontiers Neurology 2025: privação reduz RMSSD significativamente
+  const sonos = loadSonos();
+  let baseRMSSD = 50;
+  if (sonos.length >= 3) baseRMSSD = sonos.slice(-7).reduce((a,s)=>a+(s.rmssd||50),0)/Math.min(7,sonos.length);
+  const desvRMSSD = baseRMSSD > 0 ? ((rmssd - baseRMSSD)/baseRMSSD)*100 : 0;
+  let scoreHRV = 0;
+  if (desvRMSSD >= 15) scoreHRV = 100;
+  else if (desvRMSSD >= 5) scoreHRV = 80 + ((desvRMSSD-5)/10)*20;
+  else if (desvRMSSD >= 0) scoreHRV = 60 + (desvRMSSD/5)*20;
+  else if (desvRMSSD >= -10) scoreHRV = 35 + ((desvRMSSD+10)/10)*25;
+  else if (desvRMSSD >= -20) scoreHRV = 15 + ((desvRMSSD+20)/10)*20;
+  else scoreHRV = 5;
+  // Absoluto se sem histórico
+  if (sonos.length < 3) {
+    if (rmssd >= 70) scoreHRV = 90;
+    else if (rmssd >= 55) scoreHRV = 75;
+    else if (rmssd >= 40) scoreHRV = 55;
+    else if (rmssd >= 25) scoreHRV = 35;
+    else scoreHRV = 15;
   }
-}
 
-function disconnectBT() {
-  try { if (ST.btDevice && ST.btDevice.gatt.connected) ST.btDevice.gatt.disconnect(); } catch(e) {}
-  ST.btOn = false; ST.btDevice = null; ST.rrIntervals = [];
-  const btn = document.getElementById('bt-btn');
-  if (btn) { btn.textContent = '📡 Conectar'; btn.className = 'bt-btn'; btn.disabled = false; }
-  const st = document.getElementById('bt-status');
-  if (st) { st.textContent = 'Desconectado'; st.style.color = 'var(--t3)'; }
-  const fc = document.getElementById('fc-live');
-  if (fc) fc.innerHTML = '-- <span style="font-size:0.7rem;color:var(--t3);">bpm</span>';
-}
+  // ── SCORE SpO2 (peso 5%) ──
+  let scoreSpO2 = 0;
+  if (spo2 >= 96) scoreSpO2 = 100;
+  else if (spo2 >= 94) scoreSpO2 = 75;
+  else if (spo2 >= 92) scoreSpO2 = 45;
+  else scoreSpO2 = 15;
 
-// ══ CALCULAR RMSSD ════════════════════════════════════════
-// Fonte: Marco Altini (HRV4Training) — validado vs sensor de referência
-// LnRMSSD = ln(RMSSD) — distribuição mais normal (Frontiers 2025)
-function calcRMSSD() {
-  const rr = ST.rrIntervals;
-  if (rr.length < 5) return;
-  const diffs = [];
-  for (let i = 1; i < rr.length; i++) diffs.push((rr[i]-rr[i-1])**2);
-  const rmssd = Math.round(Math.sqrt(diffs.reduce((a,b)=>a+b,0)/diffs.length));
-  ST.rmssd = rmssd;
-  const lnrmssd = (Math.log(rmssd)).toFixed(2);
-  // UI
-  const el = document.getElementById('rmssd-live');
-  if (el) { el.textContent = rmssd; el.style.color = rmssd >= 60 ? 'var(--grn)' : rmssd >= 40 ? 'var(--t2)' : 'var(--red)'; }
-  const cnt = document.getElementById('rr-count');
-  if (cnt) cnt.textContent = `${rr.length} R-R capturados · LnRMSSD: ${lnrmssd}`;
-}
+  // ── PENALIDADES ──
+  let penalidades = 0;
+  if (tipo === 'dia') penalidades += 12;                              // circadiano
+  if (despert >= 5) penalidades += 15;
+  else if (despert >= 3) penalidades += 8;
+  else if (despert >= 2) penalidades += 4;
+  if (resp >= 20) penalidades += 8;
+  else if (resp >= 18) penalidades += 4;
+  if (spo2 < 92) penalidades += 15;
+  if (fcNoite > 65) penalidades += 5;
 
-// ══ TIMER E PROTOCOLO ════════════════════════════════════
-function iniciarMedicao() {
-  ST.timerSec = 300;
-  ST.timerAtivo = true;
-  ST.rrIntervals = [];
-  ST.rmssd = null;
-  document.getElementById('btn-iniciar').style.display = 'none';
-  document.getElementById('btn-parar').style.display = 'block';
-  iniciarBreath();
-  ST.timer = setInterval(tickTimer, 1000);
-}
+  // ── SCORE FINAL ──
+  let score = scoreSWS*0.40 + scoreREM*0.25 + scoreDur*0.15 + scoreHRV*0.15 + scoreSpO2*0.05 - penalidades;
+  score = Math.round(Math.max(0, Math.min(100, score)));
 
-function tickTimer() {
-  if (!ST.timerAtivo) return;
-  ST.timerSec--;
-  const min = Math.floor(ST.timerSec/60);
-  const sec = ST.timerSec % 60;
-  const el = document.getElementById('timer-time');
-  if (el) el.textContent = min + ':' + String(sec).padStart(2,'0');
-  // Arco SVG
-  const arc = document.getElementById('timer-arc');
-  if (arc) {
-    const CIRC = 276.46;
-    const pct = ST.timerSec / 300;
-    arc.style.strokeDashoffset = CIRC * (1 - pct);
-    arc.style.stroke = pct > 0.5 ? 'var(--grn)' : pct > 0.25 ? 'var(--gold)' : 'var(--red)';
-  }
-  if (ST.timerSec <= 0) finalizarMedicao();
-}
+  // ── EFICIÊNCIA HRV DUAL-SENSOR ──
+  // PMC5767731: durante SWS, RMSSD é mais BAIXO que REM (paradoxo)
+  // mas RMSSD noturno total acima da baseline = sono reparador
+  const eficienciaHRV = Math.round(Math.min(100, Math.max(0, (rmssd / (baseRMSSD > 0 ? baseRMSSD : 50)) * 75)));
 
-function pararMedicao() {
-  finalizarMedicao();
-}
-
-function finalizarMedicao() {
-  clearInterval(ST.timer);
-  clearInterval(ST.breathTimer);
-  ST.timerAtivo = false;
-  document.getElementById('btn-iniciar').style.display = 'block';
-  document.getElementById('btn-parar').style.display = 'none';
-  // Usar RMSSD manual se disponível e BT não conectado
-  const manualEl = document.getElementById('rmssd-manual');
-  if ((!ST.rmssd || ST.rmssd < 10) && manualEl && manualEl.value) {
-    ST.rmssd = parseInt(manualEl.value);
-  }
-  if (!ST.rmssd || ST.rmssd < 10) {
-    alert('Insira o RMSSD manualmente no campo acima ou conecte o sensor.');
-    return;
-  }
-  const medicoes = loadMedicoes();
-  const baseline = calcBaseline(medicoes);
-  const lnrmssd = parseFloat(Math.log(ST.rmssd).toFixed(2));
-  const desvio = baseline ? Math.round(((ST.rmssd - baseline) / baseline) * 100) : 0;
-  const status = calcStatus(ST.rmssd, baseline, desvio);
-  ST.sessao = {
-    data: Date.now(), rmssd: ST.rmssd, lnrmssd, baseline,
-    desvio, status, fcAtual: ST.fcAtual,
-    rrCount: ST.rrIntervals.length,
-    duracao: Math.round((300 - ST.timerSec) / 60 * 10) / 10
+  const sessao = {
+    data: Date.now(), tipo, totalMin, deepMin, remMin, leveMin,
+    pctDeep, pctREM, pctLeve,
+    rmssd, spo2, fcNoite, resp, despert,
+    score, scoreSWS, scoreREM, scoreDur, scoreHRV, scoreSpO2,
+    penalidades, eficienciaHRV, baseRMSSD,
+    desvRMSSD: Math.round(desvRMSSD*10)/10
   };
-  renderResultado(ST.sessao);
-  showScreen('sc-resultado');
+  ST.sessao = sessao;
+
+  renderRelatorio(sessao);
+  showScreen('sc-relatorio');
 }
 
-function iniciarBreath() {
-  let inhale = true;
-  const el = document.getElementById('breath-circle');
-  const lbl = document.getElementById('breath-lbl');
-  function step() {
-    if (!ST.timerAtivo) return;
-    inhale = !inhale;
-    if (el) { el.textContent = inhale ? 'Expire' : 'Inspire'; el.className = 'breath-circle ' + (inhale ? 'exhale' : 'inhale'); }
-    if (lbl) lbl.textContent = inhale ? 'Expire lentamente...' : 'Inspire pelo nariz...';
-    ST.breathTimer = setTimeout(step, inhale ? 4000 : 4000);
-  }
-  if (el) { el.textContent = 'Inspire'; el.className = 'breath-circle inhale'; }
-  ST.breathTimer = setTimeout(step, 4000);
-}
+// ══ RENDER RELATÓRIO ══════════════════════════════════════
+function renderRelatorio(s) {
+  const d = new Date(s.data);
+  document.getElementById('rep-data-txt').textContent =
+    d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}).toUpperCase();
 
-// ══ BASELINE EMA ════════════════════════════════════════
-// Marco Altini: nunca compare valores absolutos — compare com baseline pessoal
-// EMA alpha=0.3 — peso maior para leituras recentes
-function calcBaseline(medicoes) {
-  if (medicoes.length < 3) return null;
-  const arr = medicoes.slice(-14).map(m => m.rmssd);
-  return Math.round(arr.reduce((ema, val, i) => i === 0 ? val : val * 0.3 + ema * 0.7, arr[0]));
-}
+  // Score
+  document.getElementById('rep-score').textContent = s.score;
+  const gradeMap = [[90,'⚡ ELITE'],[80,'✅ ÓTIMO'],[65,'🟡 BOM'],[50,'🟠 REGULAR'],[0,'🔴 CRÍTICO']];
+  const grade = gradeMap.find(([t])=>s.score>=t)?.[1] || '🔴 CRÍTICO';
+  document.getElementById('rep-grade').textContent = grade;
+  const gradeColors = {'⚡ ELITE':'#2dd4bf','✅ ÓTIMO':'#3b82f6','🟡 BOM':'#eab308','🟠 REGULAR':'#f97316','🔴 CRÍTICO':'#ef4444'};
+  document.getElementById('rep-grade').style.color = gradeColors[grade] || '#2dd4bf';
 
-// ══ STATUS ═══════════════════════════════════════════════
-// Thresholds baseados em:
-// HRV4Training — Marco Altini — validado em 100.000+ medições
-// Frontiers in Physiology 2025 — desvios > 10% são clinicamente relevantes
-function calcStatus(rmssd, baseline, desvio) {
-  if (!baseline) {
-    if (rmssd >= 70) return 'RECUPERADO';
-    if (rmssd >= 50) return 'NORMAL';
-    if (rmssd >= 35) return 'ALERTA';
-    return 'SOBRECARREGADO';
-  }
-  if (desvio >= 10) return 'RECUPERADO';
-  if (desvio >= -5) return 'NORMAL';
-  if (desvio >= -15) return 'ALERTA';
-  return 'SOBRECARREGADO';
-}
+  setTimeout(()=>drawRing(s.score), 100);
 
-const STATUS_COLORS = {
-  'RECUPERADO':   '#10b981',
-  'NORMAL':       '#3b82f6',
-  'ALERTA':       '#f59e0b',
-  'SOBRECARREGADO':'#ef4444'
-};
-const STATUS_SUBS = {
-  'RECUPERADO':    'Sistema nervoso em dominância parassimpática — alta prontidão',
-  'NORMAL':        'Equilíbrio dentro da sua variação habitual',
-  'ALERTA':        'HRV abaixo da baseline — carga acumulada detectada',
-  'SOBRECARREGADO':'Sistema simpático dominante — priorize recuperação hoje'
-};
+  // Stats
+  document.getElementById('rs-total').textContent = fmtMin(s.totalMin);
+  document.getElementById('rs-efic').textContent = Math.round(s.scoreHRV) + '%';
+  document.getElementById('rs-hrv-efi').textContent = s.eficienciaHRV + '%';
 
-// ══ RENDER HOME ══════════════════════════════════════════
-function renderHome() {
-  const medicoes = loadMedicoes();
-  const baseline = calcBaseline(medicoes);
-  const ultima = medicoes[0] || null;
-  const statusCard = document.getElementById('status-card');
-  const trendCard = document.getElementById('trend-card');
+  // Hipnograma visual
+  renderHipnograma(s);
 
-  if (!ultima) {
-    document.getElementById('home-rmssd').textContent = '--';
-    document.getElementById('home-lnrmssd').textContent = '--';
-    document.getElementById('home-baseline').textContent = '--';
-    document.getElementById('home-desvio').textContent = '--';
-    document.getElementById('status-label').textContent = 'SEM DADOS';
-    document.getElementById('status-sub').textContent = 'Faça a primeira medição para calibrar o sistema';
-    statusCard.style.borderColor = 'rgba(255,255,255,0.08)';
-    trendCard.style.display = 'none';
-    return;
-  }
+  // Barras de fase
+  setTimeout(() => {
+    document.getElementById('bar-deep').style.width = Math.min(s.pctDeep,100) + '%';
+    document.getElementById('bar-rem').style.width  = Math.min(s.pctREM,100)  + '%';
+    document.getElementById('bar-light').style.width= Math.min(s.pctLeve,100) + '%';
+    document.getElementById('pct-deep').textContent = s.pctDeep.toFixed(0) + '%';
+    document.getElementById('pct-rem').textContent  = s.pctREM.toFixed(0)  + '%';
+    document.getElementById('pct-light').textContent= s.pctLeve.toFixed(0) + '%';
+  }, 200);
 
-  const cor = STATUS_COLORS[ultima.status] || '#10b981';
-  statusCard.style.borderColor = cor + '50';
-  statusCard.style.boxShadow = `0 0 30px ${cor}12`;
-
-  document.getElementById('home-rmssd').textContent = ultima.rmssd;
-  document.getElementById('home-rmssd').style.color = cor;
-  document.getElementById('home-lnrmssd').textContent = ultima.lnrmssd;
-  document.getElementById('home-lnrmssd').style.color = cor;
-  document.getElementById('home-baseline').textContent = baseline ? baseline + 'ms' : '--';
-  document.getElementById('home-desvio').textContent = ultima.desvio ? (ultima.desvio >= 0 ? '+' : '') + ultima.desvio + '%' : '--';
-  document.getElementById('home-desvio').style.color = ultima.desvio >= 0 ? 'var(--grn)' : ultima.desvio >= -10 ? 'var(--gold)' : 'var(--red)';
-  document.getElementById('status-label').textContent = ultima.status;
-  document.getElementById('status-label').style.color = cor;
-  document.getElementById('status-sub').textContent = STATUS_SUBS[ultima.status] || '';
-
-  // Ring
-  const ring = document.getElementById('status-ring');
-  const dot = document.getElementById('status-dot');
-  if (ring) {
-    const pct = Math.min(Math.max((ultima.rmssd / 100), 0.05), 1);
-    ring.style.width = Math.round(36 * pct) + 'px';
-    ring.style.fill = cor;
-    ring.style.opacity = '0.9';
-  }
-  if (dot) { dot.style.fill = cor; dot.style.opacity = '0.2'; }
-
-  // Tendência
-  if (medicoes.length >= 3) {
-    trendCard.style.display = 'flex';
-    const ultimas = medicoes.slice(0, 10).reverse();
-    const max = Math.max(...ultimas.map(m => m.rmssd));
-    const barsEl = document.getElementById('trend-bars');
-    const labelsEl = document.getElementById('trend-labels');
-    barsEl.innerHTML = ultimas.map(m => {
-      const h = Math.max(8, (m.rmssd / max) * 36);
-      const c = STATUS_COLORS[m.status] || '#10b981';
-      return `<div class="trend-bar" style="height:${h}px;background:${c};"></div>`;
-    }).join('');
-    labelsEl.innerHTML = ultimas.map((m, i) => {
-      const d = new Date(m.data);
-      return `<span>${d.getDate()}</span>`;
-    }).join('');
-  } else {
-    trendCard.style.display = 'none';
-  }
-}
-
-// ══ RENDER RESULTADO ══════════════════════════════════════
-function renderResultado(s) {
-  const cor = STATUS_COLORS[s.status] || '#10b981';
-  const resCard = document.getElementById('res-status-card');
-  resCard.style.borderColor = cor + '50';
-
-  document.getElementById('res-data-txt').textContent =
-    new Date(s.data).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}).toUpperCase();
-  document.getElementById('res-status-label').textContent = s.status;
-  document.getElementById('res-status-label').style.color = cor;
-  document.getElementById('res-rmssd').textContent = s.rmssd;
-  document.getElementById('res-rmssd').style.color = cor;
-  document.getElementById('res-lnrmssd').textContent = s.lnrmssd;
-  document.getElementById('res-lnrmssd').style.color = cor;
-  document.getElementById('res-baseline').textContent = s.baseline ? s.baseline + 'ms' : 'Calibrando';
-  document.getElementById('res-desvio').textContent = s.baseline ? (s.desvio >= 0 ? '+' : '') + s.desvio + '%' : '--';
-  document.getElementById('res-desvio').style.color = s.desvio >= 0 ? 'var(--grn)' : s.desvio >= -10 ? 'var(--gold)' : 'var(--red)';
-
-  // Métricas
-  const medicoes = loadMedicoes();
-  const media7d = medicoes.length >= 3 ? Math.round(medicoes.slice(0,7).reduce((a,m)=>a+m.rmssd,0)/Math.min(7,medicoes.length)) : null;
-  document.getElementById('res-metrics').innerHTML = `
-    <div class="metric-item"><div class="metric-val" style="color:${cor}">${s.rmssd} ms</div><div class="metric-lbl">RMSSD</div></div>
-    <div class="metric-item"><div class="metric-val" style="color:var(--grn)">${s.lnrmssd}</div><div class="metric-lbl">LnRMSSD</div></div>
-    <div class="metric-item"><div class="metric-val" style="color:var(--t2)">${s.rrCount}</div><div class="metric-lbl">R-R capturados</div></div>
-    <div class="metric-item"><div class="metric-val" style="color:var(--t2)">${media7d ? media7d+'ms' : '--'}</div><div class="metric-lbl">Média 7D</div></div>
-  `;
+  // Cruzamento dual-sensor
+  renderSensorCross(s);
 
   // Alertas
-  const alertas = [];
-  if (s.status === 'RECUPERADO') alertas.push({tipo:'alert-grn', txt:'✅ HRV acima da sua baseline — organismo em dominância parassimpática. Janela ideal para treino ou alta demanda cognitiva.'});
-  if (s.status === 'ALERTA') alertas.push({tipo:'alert-warn', txt:'⚠️ HRV ' + Math.abs(s.desvio) + '% abaixo da baseline — carga acumulada do turno detectada. Priorize recuperação sobre intensidade.'});
-  if (s.status === 'SOBRECARREGADO') alertas.push({tipo:'alert-red', txt:'🔴 HRV ' + Math.abs(s.desvio) + '% abaixo da baseline — sistema simpático dominante. Evite treino intenso e estresse adicional hoje.'});
-  if (!s.baseline) alertas.push({tipo:'alert-warn', txt:'📊 Primeiras medições — sistema calibrando sua linha base pessoal. O insight real começa com 3+ dias.'});
-  document.getElementById('res-alertas').innerHTML = alertas.map(a=>`<div class="alert-box ${a.tipo}">${a.txt}</div>`).join('');
+  renderAlertas(s);
 
   // IA
-  gerarIA(s, medicoes);
+  gerarIA(s);
 }
 
-// ══ IA OFFLINE ═══════════════════════════════════════════
-// Fontes embarcadas:
-// • Marco Altini (HRV4Training) — protocolo matinal validado vs sensor de referência
-// • Frontiers Physiology 2025 — desvio HRV e performance
-// • HRV4Training App — 100.000+ medições, thresholds validados
-// • PMC5767731 — RMSSD por fase do sono
-// • Frontiers Neurology 2025 — privação sono e RMSSD
-// • Journal Circadian Rhythms 2024 — turno noturno e SNA
-// • Sensors 2025 — LnRMSSD distribuição normal e precisão
-// • Dial et al. 2025 — HRV noturno vs ECG referência
-function gerarIA(s, medicoes) {
-  const body = document.getElementById('ai-body');
-  if (!body) return;
-  body.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--t3);font-size:0.72rem;"><div class="ai-dots"><span></span><span></span><span></span></div> Analisando...</div>';
+function renderHipnograma(s) {
+  const totalMin = s.totalMin;
+  function makeSegments(stageMin, color, opacity) {
+    const pct = totalMin > 0 ? (stageMin/totalMin)*100 : 0;
+    return `<div style="width:${pct}%;background:${color};opacity:${opacity};height:100%;border-radius:2px;transition:width 1s ease;"></div>`;
+  }
+
+  const wakeMin = Math.max(0, s.despert * 4);
+  const wakeAdjMin = Math.min(wakeMin, totalMin * 0.1);
 
   setTimeout(() => {
-    const temBase = s.baseline && medicoes.length >= 3;
-    const media7d = medicoes.length >= 3 ? Math.round(medicoes.slice(0,7).reduce((a,m)=>a+m.rmssd,0)/Math.min(7,medicoes.length)) : null;
-    let linhas = [];
+    document.getElementById('hipo-wake').innerHTML  = makeSegments(wakeAdjMin, '#ef4444', 0.8);
+    document.getElementById('hipo-light').innerHTML = makeSegments(s.leveMin, '#64748b', 0.7);
+    document.getElementById('hipo-rem').innerHTML   = makeSegments(s.remMin, '#6d28d9', 0.85);
+    document.getElementById('hipo-deep').innerHTML  = makeSegments(s.deepMin, '#1d4ed8', 0.9);
+  }, 300);
 
-    // Linha 1 — Status HRV
-    if (s.status === 'RECUPERADO') {
-      linhas.push(temBase
-        ? `✅ RMSSD ${s.rmssd}ms — ${s.desvio}% acima da sua base (${s.baseline}ms). Sistema recuperado.`
-        : `✅ RMSSD ${s.rmssd}ms — sistema em dominância parassimpática.`);
-    } else if (s.status === 'NORMAL') {
-      linhas.push(temBase
-        ? `⚪ RMSSD ${s.rmssd}ms — ${s.desvio}% da base (${s.baseline}ms). Equilíbrio normal.`
-        : `⚪ RMSSD ${s.rmssd}ms — dentro do esperado.`);
-    } else if (s.status === 'ALERTA') {
-      linhas.push(temBase
-        ? `⚠️ RMSSD ${s.rmssd}ms — ${Math.abs(s.desvio)}% abaixo da base (${s.baseline}ms). Carga acumulada.`
-        : `⚠️ RMSSD ${s.rmssd}ms — HRV abaixo do habitual.`);
-    } else {
-      linhas.push(temBase
-        ? `🔴 RMSSD ${s.rmssd}ms — ${Math.abs(s.desvio)}% abaixo da base (${s.baseline}ms). Sistema sobrecarregado.`
-        : `🔴 RMSSD ${s.rmssd}ms — sobrecarga detectada.`);
-    }
-
-    // Linha 2 — Tendência 7d
-    if (media7d && medicoes.length >= 5) {
-      const tend = s.rmssd > media7d ? '↗ subindo' : s.rmssd < media7d ? '↘ caindo' : '→ estável';
-      linhas.push(`Tendência 7d: ${tend} (média ${media7d}ms).`);
-    }
-
-    // Linha 3 — Recomendação direta
-    const rec = {
-      'RECUPERADO':    '→ Janela verde. Treino intenso ou turno pesado: liberdade total.',
-      'NORMAL':        '→ Siga o plano. Sem ajuste necessário.',
-      'ALERTA':        '→ Reduza intensidade. Priorize sono e proteína.',
-      'SOBRECARREGADO':'→ Repouso ativo. Não adicione carga hoje.'
-    };
-    linhas.push(rec[s.status] || '→ Monitore amanhã.');
-
-    if (!temBase) linhas.push('📊 Calibrando baseline — insight completo em 3+ medições.');
-
-    body.style.opacity = '0'; body.style.transition = 'opacity 0.5s';
-    setTimeout(() => { body.textContent = linhas.join(' '); body.style.opacity = '1'; }, 400);
-  }, 1200);
+  // Eixo X
+  const horas = Math.ceil(totalMin/60);
+  const axisEl = document.getElementById('hipo-axis-labels');
+  let axisTxt = '';
+  for (let i = 0; i <= Math.min(horas, 10); i++) axisTxt += `<span>${i}h</span>`;
+  axisEl.innerHTML = axisTxt;
 }
 
-// ══ SALVAR ════════════════════════════════════════════════
-function salvarMedicao() {
+function renderSensorCross(s) {
+  const el = document.getElementById('sensor-cross');
+  const sonos = loadSonos();
+  const baseRMSSD = s.baseRMSSD || 50;
+  const desv = s.desvRMSSD;
+
+  const rows = [
+    {
+      lbl: 'RMSSD Noturno (HW9)',
+      val: s.rmssd + ' ms',
+      color: s.rmssd >= baseRMSSD ? '#2dd4bf' : '#eab308',
+      sub: sonos.length >= 3 ? `Base: ${Math.round(baseRMSSD)}ms · Desvio: ${desv >= 0 ? '+' : ''}${desv}%` : 'Primeiras noites — calibrando baseline'
+    },
+    {
+      lbl: 'SpO2 Mínimo (Balance 2)',
+      val: s.spo2 + '%',
+      color: s.spo2 >= 95 ? '#2dd4bf' : s.spo2 >= 92 ? '#eab308' : '#ef4444',
+      sub: s.spo2 >= 95 ? 'Saturação ótima — sem episódios hipóxicos' : s.spo2 >= 92 ? 'Leve queda — monitorar tendência' : 'Alerta — possível apneia'
+    },
+    {
+      lbl: 'FC Noturna (Balance 2)',
+      val: s.fcNoite + ' bpm',
+      color: s.fcNoite <= 55 ? '#2dd4bf' : s.fcNoite <= 65 ? '#a1a1aa' : '#eab308',
+      sub: s.fcNoite <= 55 ? 'Excelente — dominância parassimpática' : s.fcNoite <= 65 ? 'Normal para turno noturno' : 'Levemente elevada — verificar estresse'
+    },
+    {
+      lbl: 'Freq. Respiratória (B2)',
+      val: s.resp + ' rpm',
+      color: s.resp <= 16 ? '#2dd4bf' : s.resp <= 20 ? '#eab308' : '#ef4444',
+      sub: s.resp <= 14 ? 'Ótima — ressonância cardíaca em range' : s.resp <= 16 ? 'Normal' : 'Elevada — indicativo de estresse/infecção'
+    },
+  ];
+
+  el.innerHTML = rows.map(r => `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--bd);">
+      <div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--t3);">${r.lbl}</div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:0.58rem;color:var(--t3);margin-top:2px;">${r.sub}</div>
+      </div>
+      <div style="font-family:'Lilita One',cursive;font-size:1.1rem;color:${r.color};flex-shrink:0;margin-left:10px;">${r.val}</div>
+    </div>
+  `).join('');
+}
+
+function renderAlertas(s) {
+  const el = document.getElementById('alertas-container');
+  const alertas = [];
+
+  if (s.pctDeep < 15) alertas.push({tipo:'alert-crit', txt:'⚠️ Sono Profundo abaixo de 15% — reparo muscular comprometido. Lundstrom EJSC 2025 confirmou que SWS% < 15% reduz performance significativamente.'});
+  else if (s.pctDeep >= 20) alertas.push({tipo:'alert-deep', txt:'✅ Sono Profundo excelente (' + s.pctDeep.toFixed(0) + '%) — reparo miofibrilar e síntese de GH em máxima eficiência. PMC12166452 confirma SWS > 20% como ideal para trabalhadores físicos.'});
+
+  if (s.pctREM < 15) alertas.push({tipo:'alert-warn', txt:'⚠️ REM abaixo de 15% — consolidação de memória e regulação emocional comprometidas. REM é crítico para recuperação cognitiva.'});
+  else if (s.pctREM >= 22) alertas.push({tipo:'alert-rem', txt:'✅ REM sólido (' + s.pctREM.toFixed(0) + '%) — BDNF elevado, plasticidade sináptica em andamento. Regulação emocional e memória otimizadas.'});
+
+  if (s.spo2 < 92) alertas.push({tipo:'alert-crit', txt:'🚨 SpO2 mínimo crítico (' + s.spo2 + '%) — possível apneia obstrutiva. Consulte médico. Hipóxia noturna compromete recuperação cardiovascular.'});
+
+  if (s.tipo === 'dia') alertas.push({tipo:'alert-warn', txt:'☀️ Sono diurno ativo — penalidade circadiana de 12 pontos aplicada. Ritmo circadiano suprime melatonina e fragmenta o SWS. Journal Circadian Rhythms 2024.'});
+
+  if (s.despert >= 3) alertas.push({tipo:'alert-warn', txt:'🌙 ' + s.despert + ' despertares detectados — fragmentação aumenta tônus simpático e reduz eficiência do SWS. Dial et al. 2025: fragmentação é o fator mais impactante no HRV noturno.'});
+
+  const sonos = loadSonos();
+  if (sonos.length >= 3) {
+    const mediaScore7d = sonos.slice(-7).reduce((a,s)=>a+(s.score||0),0)/Math.min(7,sonos.length);
+    if (mediaScore7d < 50) alertas.push({tipo:'alert-crit', txt:'🔴 Média de sono 7D: ' + Math.round(mediaScore7d) + '% — débito crônico acumulado. Frontiers Neurology 2025: privação crônica reduz RMSSD significativamente (p<0.05).'});
+  }
+
+  el.innerHTML = alertas.map(a => `<div class="alert-box ${a.tipo}">${a.txt}</div>`).join('');
+}
+
+// ══ IA OFFLINE ══════════════════════════════════════════
+// Fontes:
+// • PMC5767731 — RMSSD por fase (SWS RMSSD < REM — paradoxo documentado)
+// • Dial et al. 2025 — 536 noites validação wearables vs ECG
+// • Lundstrom EJSC 2025 — SWS% R²=0.883 para performance
+// • Frontiers Neurology 2025 — privação sono reduz RMSSD p<0.05
+// • PMC12166452 — SWS aumenta 40% após exercício físico extremo
+// • Marco Altini/HRV4Training — HW9 validado vs sensor de referência
+// • AASM 2025 — alvos clínicos de fases
+// • Journal Circadian Rhythms 2024 — turno noturno e melatonina
+// • Whoop 2025 — algoritmo HRV ponderado para SWS
+
+function gerarIA(s) {
+  const body = document.getElementById('ai-body');
+  if (!body) return;
+  body.innerHTML = '<div class="ai-load"><div class="ai-dots"><span></span><span></span><span></span></div> Cruzando HW9 × Balance 2...</div>';
+
+  setTimeout(() => {
+    let txt = '';
+    // Linha 1 — Score geral
+    if (s.score >= 85)      txt += `✅ Score ${s.score}/100 — Noite excelente. `;
+    else if (s.score >= 70) txt += `🟢 Score ${s.score}/100 — Noite sólida. `;
+    else if (s.score >= 50) txt += `🟡 Score ${s.score}/100 — Noite comprometida. `;
+    else                    txt += `🔴 Score ${s.score}/100 — Noite crítica. `;
+
+    // Linha 2 — Fase mais crítica
+    if (s.pctDeep >= 20)
+      txt += `SWS ${s.pctDeep.toFixed(0)}% ✅ (alvo 20%) — reparo muscular máximo. `;
+    else if (s.pctDeep >= 15)
+      txt += `SWS ${s.pctDeep.toFixed(0)}% — dentro do aceitável (alvo 20%). `;
+    else
+      txt += `SWS ${s.pctDeep.toFixed(0)}% ⚠️ abaixo de 15% — reparo muscular insuficiente. `;
+
+    if (s.pctREM >= 20)
+      txt += `REM ${s.pctREM.toFixed(0)}% ✅. `;
+    else
+      txt += `REM ${s.pctREM.toFixed(0)}% — abaixo do alvo (20%). `;
+
+    // Linha 3 — RMSSD se disponível
+    if (s.rmssd && s.baseRMSSD) {
+      const desv = ((s.rmssd - s.baseRMSSD) / s.baseRMSSD) * 100;
+      if (desv >= 5)       txt += `HRV noturno ${s.rmssd}ms ↗ — SNA recuperado. `;
+      else if (desv >= -5) txt += `HRV noturno ${s.rmssd}ms — equilíbrio autonômico. `;
+      else                 txt += `HRV noturno ${s.rmssd}ms ↘ — SNA ainda em recuperação. `;
+    }
+
+    // Linha 4 — SpO2 só se relevante
+    if (s.spo2 < 95)
+      txt += `SpO2 ${s.spo2}% ⚠️ — monitore tendência. Abaixo de 92% recorrente: avaliação clínica. `;
+
+    // Linha 5 — Tipo sono
+    if (s.tipo === 'dia') txt += `Sono diurno: eficiência natural ~15% menor. `;
+
+    // Linha 6 — Recomendação
+    if (s.score >= 85)      txt += `→ Capital máximo de recuperação. Treino pesado liberado.`;
+    else if (s.score >= 70) txt += `→ Hidratação e proteína. Treino moderado ok.`;
+    else if (s.score >= 50) txt += `→ Evite carga extra. Priorize próxima janela de sono.`;
+    else                    txt += `→ Repouso ativo. Não adicione estresse sobre esse déficit.`;
+
+    body.style.opacity = '0'; body.style.transition = 'opacity 0.5s';
+    setTimeout(() => { body.textContent = txt; body.style.opacity = '1'; }, 400);
+  }, 1400);
+}
+
+// ══ SALVAR ═══════════════════════════════════════════════
+function salvarSono() {
   if (!ST.sessao) return;
-  // Salvar no RECOVERY
-  const medicoes = loadMedicoes();
-  medicoes.unshift(ST.sessao);
-  saveMedicoes(medicoes);
-  // Salvar também no localStorage compartilhado para o dashboard
-  try {
-    localStorage.setItem('recovery_ultima_rmssd', ST.sessao.rmssd);
-    localStorage.setItem('recovery_ultimo_status', ST.sessao.status);
-    localStorage.setItem('recovery_ultimo_ts', ST.sessao.data);
-  } catch(e) {}
-  document.getElementById('btn-salvar-res').textContent = '✅ Salvo!';
-  document.getElementById('btn-salvar-res').disabled = true;
+  const sonos = loadSonos();
+  sonos.unshift(ST.sessao);
+  saveSonos(sonos);
+  document.getElementById('btn-salvar').textContent = '✅ Salvo!';
+  document.getElementById('btn-salvar').disabled = true;
   setTimeout(() => showScreen('sc-home'), 1200);
 }
 
-// ══ HISTÓRICO ════════════════════════════════════════════
-function renderHistorico() {
-  const medicoes = loadMedicoes();
-  const el = document.getElementById('hist-lista');
-  if (!medicoes.length) {
-    el.innerHTML = '<div class="hist-empty">Nenhuma medição registrada ainda.<br>Faça a primeira medição matinal!</div>';
+// ══ HOME ═════════════════════════════════════════════════
+function renderHome() {
+  const sonos = loadSonos();
+  const welcomeEl = document.getElementById('home-welcome');
+  const ultimoEl  = document.getElementById('home-ultimo');
+  const histCard  = document.getElementById('home-hist-card');
+
+  if (sonos.length === 0) {
+    welcomeEl.style.display = 'flex';
+    ultimoEl.style.display  = 'none';
+    histCard.style.display  = 'none';
     return;
   }
-  el.innerHTML = medicoes.map((m, i) => {
-    const d = new Date(m.data);
+
+  welcomeEl.style.display = 'none';
+  ultimoEl.style.display  = 'flex';
+
+  const s = sonos[0];
+  const gradeMap = [[90,'⚡ Elite'],[80,'✅ Ótimo'],[65,'🟡 Bom'],[50,'🟠 Regular'],[0,'🔴 Crítico']];
+  const grade = gradeMap.find(([t])=>s.score>=t)?.[1]||'🔴';
+  const gradeColors = {'⚡ Elite':'#2dd4bf','✅ Ótimo':'#3b82f6','🟡 Bom':'#eab308','🟠 Regular':'#f97316','🔴 Crítico':'#ef4444'};
+  const cor = gradeColors[grade]||'#a1a1aa';
+
+  document.getElementById('home-stats-grid').innerHTML = `
+    <div class="sh-item"><div class="sh-val" style="color:${cor}">${s.score}</div><div class="sh-lbl">Score</div></div>
+    <div class="sh-item"><div class="sh-val" style="color:#93c5fd">${fmtMin(s.totalMin)}</div><div class="sh-lbl">Duração</div></div>
+    <div class="sh-item"><div class="sh-val" style="color:#1d4ed8">${s.pctDeep.toFixed(0)}%</div><div class="sh-lbl">Profundo</div></div>
+    <div class="sh-item"><div class="sh-val" style="color:#6d28d9">${s.pctREM.toFixed(0)}%</div><div class="sh-lbl">REM</div></div>
+  `;
+
+  // Mini hipnograma
+  const miniHipo = document.getElementById('home-mini-hipo');
+  const t = s.totalMin;
+  miniHipo.innerHTML = `
+    <div style="width:${t>0?(s.deepMin/t*100):0}%;background:#1d4ed8;height:100%;border-radius:2px;"></div>
+    <div style="width:${t>0?(s.remMin/t*100):0}%;background:#6d28d9;height:100%;border-radius:2px;"></div>
+    <div style="width:${t>0?(s.leveMin/t*100):0}%;background:#64748b;height:100%;border-radius:2px;"></div>
+  `;
+
+  // Histórico mini
+  if (sonos.length > 1) {
+    histCard.style.display = 'flex';
+    document.getElementById('home-hist-lista').innerHTML = sonos.slice(0,3).map(s => {
+      const d = new Date(s.data);
+      const day = String(d.getDate()).padStart(2,'0');
+      const mon = d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase();
+      const cor2 = s.score >= 80 ? '#2dd4bf' : s.score >= 60 ? '#3b82f6' : s.score >= 40 ? '#eab308' : '#ef4444';
+      const t2 = s.totalMin;
+      return `<div class="hist-item">
+        <div class="hi-date"><div class="hi-d">${day}</div><div class="hi-m">${mon}</div></div>
+        <div class="hi-bar">
+          <div class="hi-hipo">
+            <div style="width:${t2>0?(s.deepMin/t2*100):0}%;background:#1d4ed8;"></div>
+            <div style="width:${t2>0?(s.remMin/t2*100):0}%;background:#6d28d9;"></div>
+            <div style="width:${t2>0?(s.leveMin/t2*100):0}%;background:#64748b;"></div>
+          </div>
+          <div class="hi-meta">${fmtMin(s.totalMin)} · RMSSD ${s.rmssd}ms · SpO2 ${s.spo2}%</div>
+        </div>
+        <div class="hi-right">
+          <div class="hi-score" style="color:${cor2}">${s.score}</div>
+          <div class="hi-grade" style="color:${cor2}">${s.tipo==='dia'?'☀️':'🌙'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    histCard.style.display = 'none';
+  }
+}
+
+// ══ HISTÓRICO COMPLETO ════════════════════════════════════
+function renderHistorico() {
+  const sonos = loadSonos();
+  const el = document.getElementById('hist-lista');
+  if (!sonos.length) {
+    el.innerHTML = '<div class="hist-empty">Nenhuma noite registrada ainda.<br>Complete seu primeiro registro!</div>';
+    return;
+  }
+  el.innerHTML = sonos.map((s, i) => {
+    const d = new Date(s.data);
     const day = String(d.getDate()).padStart(2,'0');
     const mon = d.toLocaleDateString('pt-BR',{month:'short'}).toUpperCase();
-    const cor = STATUS_COLORS[m.status] || '#10b981';
+    const time = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const cor = s.score >= 80 ? '#2dd4bf' : s.score >= 60 ? '#3b82f6' : s.score >= 40 ? '#eab308' : '#ef4444';
+    const t = s.totalMin;
     return `<div class="hist-item">
       <div class="hi-date"><div class="hi-d">${day}</div><div class="hi-m">${mon}</div></div>
       <div class="hi-bar">
-        <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px;">
-          <div style="height:100%;width:${Math.min(m.rmssd,100)}%;background:${cor};border-radius:3px;"></div>
+        <div class="hi-hipo">
+          <div style="width:${t>0?(s.deepMin/t*100):0}%;background:#1d4ed8;height:100%;border-radius:2px;"></div>
+          <div style="width:${t>0?(s.remMin/t*100):0}%;background:#6d28d9;height:100%;border-radius:2px;"></div>
+          <div style="width:${t>0?(s.leveMin/t*100):0}%;background:#64748b;height:100%;border-radius:2px;"></div>
         </div>
-        <div class="hi-meta">RMSSD ${m.rmssd}ms · LnRMSSD ${m.lnrmssd} · ${m.baseline?'Base '+m.baseline+'ms':'Calibrando'}</div>
+        <div class="hi-meta">${time} · ${fmtMin(s.totalMin)} · Score ${s.score} · ${s.tipo==='dia'?'Dia':'Noite'}</div>
       </div>
       <div class="hi-right">
-        <div class="hi-rmssd" style="color:${cor}">${m.rmssd}</div>
-        <div class="hi-status" style="color:${cor}">${m.status}</div>
-        <button class="del-btn" onclick="deletarMedicao(${i})">DEL</button>
+        <div class="hi-score" style="color:${cor}">${s.score}</div>
+        <button class="del-btn" onclick="deletarSono(${i})">DEL</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function deletarMedicao(i) {
-  if (!confirm('Apagar esta medição?')) return;
-  const medicoes = loadMedicoes(); medicoes.splice(i,1); saveMedicoes(medicoes);
+function deletarSono(i) {
+  if (!confirm('Apagar este registro?')) return;
+  const sonos = loadSonos(); sonos.splice(i,1); saveSonos(sonos);
   renderHistorico();
 }
 
@@ -913,11 +1045,14 @@ window.addEventListener('load', () => {
     const sp = document.getElementById('splash');
     if (sp) { sp.classList.add('hide'); setTimeout(() => { try{sp.remove();}catch(e){} }, 1000); }
   }, 2400);
+
   document.getElementById('hdr-date').textContent =
     new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}).toUpperCase();
+
   initBG();
   renderHome();
   showScreen('sc-home');
+  setTimeout(atualizarTotal, 300);
 });
 </script>
 </body>
