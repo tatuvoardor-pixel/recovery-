@@ -749,11 +749,13 @@ function renderHome() {
     const fillH = Math.max(3, Math.round(MAX_H * score / 100));
     const fillY = 131 - fillH; // âncora no fundo (y=131 = bottom interno)
 
-    // Cor por nível
-    const batCor = score >= 76 ? '#10b981'
-                 : score >= 51 ? '#22c55e'
-                 : score >= 26 ? '#f59e0b'
-                 : '#ef4444';
+    // Cor igual ao status — bateria e texto sempre combinam
+    const batCor = {
+      'RECUPERADO':    '#10b981',
+      'NORMAL':        '#3b82f6',
+      'ALERTA':        '#f59e0b',
+      'SOBRECARREGADO':'#ef4444'
+    }[ultima.status] || '#3b82f6';
 
     batFill.setAttribute('height', fillH);
     batFill.setAttribute('y', fillY);
