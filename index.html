@@ -237,19 +237,18 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
             <rect id="bat-border" x="6" y="14" width="68" height="122" rx="12" fill="none" stroke="#10b981" stroke-width="3" opacity="0.25"/>
             <!-- Fundo interno -->
             <rect x="11" y="19" width="58" height="112" rx="8" fill="#0a0a0c"/>
-            <!-- Segmentos guia (linhas internas) -->
-            <line x1="11" y1="56" x2="69" y2="56" stroke="#1a1a20" stroke-width="1"/>
-            <line x1="11" y1="84" x2="69" y2="84" stroke="#1a1a20" stroke-width="1"/>
-            <line x1="11" y1="112" x2="69" y2="112" stroke="#1a1a20" stroke-width="1"/>
+
             <!-- Preenchimento dinâmico (sobe de baixo) -->
-            <rect id="bat-fill" x="11" y="131" width="58" height="0" rx="0"
-              style="transition:height 1.2s ease,y 1.2s ease,fill 0.5s;"/>
+            <rect id="bat-fill" x="11" y="125" width="58" height="6" rx="3"
+              fill="#ef4444" opacity="0.4"
+              style="transition:height 1.2s ease,y 1.2s ease,fill 0.5s,opacity 0.5s;"/>
             <!-- Brilho no topo do preenchimento -->
-            <rect id="bat-glow" x="11" y="131" width="58" height="0" rx="0" opacity="0.6"
+            <rect id="bat-glow" x="11" y="125" width="58" height="4" rx="2"
+              fill="#ef4444" opacity="0.3"
               style="transition:height 0.5s,y 1.2s ease,fill 0.5s;"/>
             <!-- Percentual dentro -->
             <text id="bat-pct" x="40" y="82" text-anchor="middle" font-family="'Lilita One',cursive"
-              font-size="18" fill="#e5e5e5" opacity="0.9">--</text>
+              font-size="18" fill="#555566" opacity="0.9">--</text>
           </svg>
         </div>
         <div class="status-label" id="status-label">--</div>
@@ -737,7 +736,15 @@ function renderHome() {
 
   if (batFill) {
     // Score 0-100 baseado no desvio
-    const score = ultima.score || clamp(Math.round(50 + (ultima.desvio || 0) * 2), 0, 100);
+    // Score 0-100 baseado no status
+    const _desvio = ultima.desvio || 0;
+    const _scoreMap = {
+      'RECUPERADO':    Math.min(100, Math.round(75 + Math.max(0, _desvio))),
+      'NORMAL':        Math.round(50 + _desvio),
+      'ALERTA':        Math.round(35 + _desvio),
+      'SOBRECARREGADO': Math.max(5, Math.round(20 + _desvio))
+    };
+    const score = Math.min(100, Math.max(5, _scoreMap[ultima.status] || 50));
     const MAX_H = 112; // altura interna da bateria em viewBox units
     const fillH = Math.max(3, Math.round(MAX_H * score / 100));
     const fillY = 131 - fillH; // âncora no fundo (y=131 = bottom interno)
