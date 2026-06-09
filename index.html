@@ -75,7 +75,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
   box-shadow:0 0 30px rgba(16,185,129,0.08);
 }
 .status-icon-wrap{
-  width:100px;height:100px;position:relative;display:flex;align-items:center;justify-content:center;
+  width:80px;height:130px;position:relative;display:flex;align-items:center;justify-content:center;
 }
 .status-rings{position:absolute;inset:0;}
 .status-label{
@@ -230,13 +230,26 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
       <div class="status-card" id="status-card">
         <div class="lbl">Estado do Sistema Nervoso</div>
         <div class="status-icon-wrap">
-          <svg class="status-rings" id="status-svg" viewBox="0 0 100 100">
-            <rect x="28" y="16" width="44" height="68" rx="6" fill="none" stroke="#10b98130" stroke-width="3"/>
-            <rect x="40" y="10" width="20" height="10" rx="3" fill="#10b98150"/>
-            <rect id="status-ring" x="32" y="56" width="36" height="22" rx="4" fill="#10b981" opacity="0.15"
-              style="transition:opacity 0.5s,fill 0.5s;"/>
-            <rect id="status-dot" x="32" y="56" width="0" height="22" rx="4" fill="#10b981"
-              style="transition:width 1s ease,fill 0.5s;"/>
+          <svg class="status-rings" id="status-svg" viewBox="0 0 80 140" style="width:70px;height:120px;">
+            <!-- Polo positivo -->
+            <rect id="bat-polo" x="26" y="2" width="28" height="12" rx="5" fill="#10b981" opacity="0.4"/>
+            <!-- Contorno bateria -->
+            <rect id="bat-border" x="6" y="14" width="68" height="122" rx="12" fill="none" stroke="#10b981" stroke-width="3" opacity="0.25"/>
+            <!-- Fundo interno -->
+            <rect x="11" y="19" width="58" height="112" rx="8" fill="#0a0a0c"/>
+            <!-- Segmentos guia (linhas internas) -->
+            <line x1="11" y1="56" x2="69" y2="56" stroke="#1a1a20" stroke-width="1"/>
+            <line x1="11" y1="84" x2="69" y2="84" stroke="#1a1a20" stroke-width="1"/>
+            <line x1="11" y1="112" x2="69" y2="112" stroke="#1a1a20" stroke-width="1"/>
+            <!-- Preenchimento dinâmico (sobe de baixo) -->
+            <rect id="bat-fill" x="11" y="131" width="58" height="0" rx="0"
+              style="transition:height 1.2s ease,y 1.2s ease,fill 0.5s;"/>
+            <!-- Brilho no topo do preenchimento -->
+            <rect id="bat-glow" x="11" y="131" width="58" height="0" rx="0" opacity="0.6"
+              style="transition:height 0.5s,y 1.2s ease,fill 0.5s;"/>
+            <!-- Percentual dentro -->
+            <text id="bat-pct" x="40" y="82" text-anchor="middle" font-family="'Lilita One',cursive"
+              font-size="18" fill="#e5e5e5" opacity="0.9">--</text>
           </svg>
         </div>
         <div class="status-label" id="status-label">--</div>
@@ -715,16 +728,42 @@ function renderHome() {
   document.getElementById('status-label').style.color = cor;
   document.getElementById('status-sub').textContent = STATUS_SUBS[ultima.status] || '';
 
-  // Ring
-  const ring = document.getElementById('status-ring');
-  const dot = document.getElementById('status-dot');
-  if (ring) {
-    const pct = Math.min(Math.max((ultima.rmssd / 100), 0.05), 1);
-    ring.style.width = Math.round(36 * pct) + 'px';
-    ring.style.fill = cor;
-    ring.style.opacity = '0.9';
+  // Bateria Vertical
+  const batFill  = document.getElementById('bat-fill');
+  const batGlow  = document.getElementById('bat-glow');
+  const batPct   = document.getElementById('bat-pct');
+  const batBorder= document.getElementById('bat-border');
+  const batPolo  = document.getElementById('bat-polo');
+
+  if (batFill) {
+    // Score 0-100 baseado no desvio
+    const score = ultima.score || clamp(Math.round(50 + (ultima.desvio || 0) * 2), 0, 100);
+    const MAX_H = 112; // altura interna da bateria em viewBox units
+    const fillH = Math.max(3, Math.round(MAX_H * score / 100));
+    const fillY = 131 - fillH; // âncora no fundo (y=131 = bottom interno)
+
+    // Cor por nível
+    const batCor = score >= 76 ? '#10b981'
+                 : score >= 51 ? '#22c55e'
+                 : score >= 26 ? '#f59e0b'
+                 : '#ef4444';
+
+    batFill.setAttribute('height', fillH);
+    batFill.setAttribute('y', fillY);
+    batFill.setAttribute('fill', batCor);
+    batFill.setAttribute('rx', fillH > 20 ? 8 : 3);
+
+    // Glow no topo
+    const glowH = Math.min(8, fillH);
+    batGlow.setAttribute('height', glowH);
+    batGlow.setAttribute('y', fillY);
+    batGlow.setAttribute('fill', batCor);
+
+    // Percentual dentro
+    if (batPct) { batPct.textContent = score + '%'; batPct.setAttribute('fill', batCor); }
+    if (batBorder) batBorder.setAttribute('stroke', batCor);
+    if (batPolo)   batPolo.setAttribute('fill', batCor);
   }
-  if (dot) { dot.style.fill = cor; dot.style.opacity = '0.2'; }
 
   // Tendência
   if (medicoes.length >= 3) {
@@ -826,25 +865,34 @@ function gerarIA(s, medicoes) {
         : `🔴 RMSSD ${s.rmssd}ms — sobrecarga detectada.`);
     }
 
-    // Linha 2 — Tendência 7d
+    // Linha 2 — Tendência 7d com contexto
     if (media7d && medicoes.length >= 5) {
       const tend = s.rmssd > media7d ? '↗ subindo' : s.rmssd < media7d ? '↘ caindo' : '→ estável';
-      linhas.push(`Tendência 7d: ${tend} (média ${media7d}ms).`);
+      const diff = Math.abs(s.rmssd - media7d);
+      linhas.push(`Tendência 7d: ${tend} (média ${media7d}ms${diff > 5 ? ' · variação ' + diff + 'ms' : ''}).`);
+    } else if (medicoes.length >= 2) {
+      const ant = medicoes[1].rmssd;
+      const diff = s.rmssd - ant;
+      const sinal = diff > 0 ? '+' : '';
+      linhas.push(`Vs. ontem: ${sinal}${diff}ms (${ant}ms → ${s.rmssd}ms).`);
     }
 
-    // Linha 3 — Recomendação direta
+    // Linha 3 — Prescrição direta
     const rec = {
-      'RECUPERADO':    '→ Janela verde. Treino intenso ou turno pesado: liberdade total.',
-      'NORMAL':        '→ Siga o plano. Sem ajuste necessário.',
-      'ALERTA':        '→ Reduza intensidade. Priorize sono e proteína.',
-      'SOBRECARREGADO':'→ Repouso ativo. Não adicione carga hoje.'
+      'RECUPERADO':    '→ Sistema carregado. Treino intenso ou turno pesado: liberdade total.',
+      'NORMAL':        '→ Sistema equilibrado. Siga o plano sem ajustes.',
+      'ALERTA':        '→ Carga acumulada detectada. Reduza intensidade hoje.',
+      'SOBRECARREGADO':'→ Sistema sobrecarregado. Repouso ativo. Zero carga adicional.'
     };
     linhas.push(rec[s.status] || '→ Monitore amanhã.');
 
     if (!temBase) linhas.push('📊 Calibrando baseline — insight completo em 3+ medições.');
 
     body.style.opacity = '0'; body.style.transition = 'opacity 0.5s';
-    setTimeout(() => { body.textContent = linhas.join(' '); body.style.opacity = '1'; }, 400);
+    setTimeout(() => {
+      body.innerHTML = linhas.map(l => '<div style="margin-bottom:4px">' + l + '</div>').join('');
+      body.style.opacity = '1';
+    }, 400);
   }, 1200);
 }
 
